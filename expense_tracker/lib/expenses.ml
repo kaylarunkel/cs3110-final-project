@@ -8,7 +8,7 @@ type expense = {
 type expense_list = expense list
 
 let add_expense (list : expense_list) (description : string) (category : string)
-    (date : string) (amount : float) : expense_list =
+    (amount : float) (date : string) : expense_list =
   { description; category; amount; date } :: list
 
 let view_expenses (list : expense_list) : unit =

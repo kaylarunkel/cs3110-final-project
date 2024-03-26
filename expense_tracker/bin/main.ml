@@ -17,7 +17,9 @@ let rec main (list : expense_list) : unit =
       let category = read_line () in
       Printf.printf "Enter amount: ";
       let amount = read_float () in
-      let new_list = add_expense list description category amount in
+      Printf.printf "Enter date: ";
+      let date = read_line () in
+      let new_list = add_expense list description category amount date in
       main new_list
   | 2 ->
       view_expenses list;

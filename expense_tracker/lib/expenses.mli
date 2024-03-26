@@ -7,7 +7,8 @@ type expense = {
 
 type expense_list = expense list
 
-val add_expense : expense_list -> string -> string -> float -> expense_list
+val add_expense :
+  expense_list -> string -> string -> float -> string -> expense_list
 (** [add_expense list description category amount] adds a new expense to the
     expense list.
 
