@@ -46,3 +46,10 @@ val save_expenses_to_csv : string -> expense_list -> unit
 val get_expenses : expense_list -> string -> expense_list
 (** [get_expenses list criteria] takes in the expense list and a critera (ie.
     category or date) and returns a list of expenses from that criteria *)
+
+val total_expenses : expense_list -> float
+(** [total_expenses list] takes in the expense list and returns the total
+    expenses.
+
+    This is a beta version of the method as we should give it a time frame
+    input, but this will do for demo purposes*)

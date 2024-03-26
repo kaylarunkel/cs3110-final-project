@@ -46,3 +46,6 @@ let save_expenses_to_csv (filename : string) (list : expense_list) : unit =
 
 let get_expenses (list : expense_list) (criteria : string) : expense_list =
   List.filter (fun exp -> exp.category = criteria || exp.date = criteria) list
+
+let total_expenses (list : expense_list) =
+  List.fold_left (fun acc exp -> acc +. exp.amount) 0. list
