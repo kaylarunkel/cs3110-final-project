@@ -42,3 +42,7 @@ val save_expenses_to_csv : string -> expense_list -> unit
 
     [filename] is the name of the CSV file. [list] is the list of expenses to be
     saved. *)
+
+val get_expenses : expense_list -> string -> expense_list
+(** [get_expenses list criteria] takes in the expense list and a critera (ie.
+    category or date) and returns a list of expenses from that criteria *)

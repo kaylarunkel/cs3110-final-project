@@ -43,3 +43,6 @@ let save_expenses_to_csv (filename : string) (list : expense_list) : unit =
     (fun exp -> Printf.fprintf oc "%s,%.2f\n" exp.description exp.amount)
     list;
   close_out oc
+
+let get_expenses (list : expense_list) (criteria : string) : expense_list =
+  List.filter (fun exp -> exp.category = criteria || exp.date = criteria) list
