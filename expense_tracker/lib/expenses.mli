@@ -2,6 +2,7 @@ type expense = {
   description : string;
   category : string;
   amount : float;
+  date : string;
 }
 
 type expense_list = expense list

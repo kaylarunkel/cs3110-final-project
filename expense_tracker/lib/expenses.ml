@@ -2,13 +2,14 @@ type expense = {
   description : string;
   category : string;
   amount : float;
+  date : string;
 }
 
 type expense_list = expense list
 
 let add_expense (list : expense_list) (description : string) (category : string)
-    (amount : float) : expense_list =
-  { description; category; amount } :: list
+    (date : string) (amount : float) : expense_list =
+  { description; category; amount; date } :: list
 
 let view_expenses (list : expense_list) : unit =
   List.iter
@@ -26,9 +27,9 @@ let read_expenses_from_csv (filename : string) : expense_list =
     try
       let line = input_line ic in
       match String.split_on_char ',' line with
-      | [ description; category; amount_str ] ->
+      | [ description; category; amount_str; date ] ->
           let amount = float_of_string amount_str in
-          read_lines ({ description; category; amount } :: acc)
+          read_lines ({ description; category; amount; date } :: acc)
       | _ -> read_lines acc
     with End_of_file ->
       close_in ic;
