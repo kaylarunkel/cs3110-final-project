@@ -1,2 +1,3 @@
 (library
- (name expense_tracker))
+ (name expense_tracker)
+ (libraries bogue))
