@@ -17,7 +17,6 @@ publish: false
 title: "OCaml Expense Tracker
 git-repo: "https://github.coecis.cornell.edu/ipr6/cs3110-final-project"
 demo-video-url: ""
-# Write a short, attention-grabbing description of your project.
 desc: >
   Our project is an expense tracker. It supports adding expenses with descriptions,
   categories, dates, and of course amounts of the expense. Users can then look
