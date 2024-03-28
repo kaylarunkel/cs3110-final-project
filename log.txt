@@ -1,0 +1,113 @@
+commit 8e23390fbc517f56739f27177e13f68a5595138f
+Author: ipr6 <ipr6@cornell.edu>
+Date:   Wed Mar 27 21:02:48 2024 -0400
+
+    Update yaml file
+
+commit 2a996d35003028a98965ec1ea9bfcfdac26dd51c
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed Mar 27 21:01:41 2024 -0400
+
+    Add install.txt and yaml file
+    Ilia Raiszadeh (ipr6)
+
+commit 478c4253051e6dc51d9e5789e8b7baa1223e9649
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed Mar 27 16:08:46 2024 -0400
+
+    Add interface compilation unit
+    
+    - Window opens when user wants to read from csv
+    - User enters csv name, hits enter, closes window, and now can view those expenses
+
+commit f07ac5d40cfc70ef4d00b89686c9686eaa8b44f1
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 18:58:43 2024 -0400
+
+    Removed redundant code and added testing csv file
+    Ilia Raiszadeh (ipr6)
+
+commit e04815746eccc5e79924516a9897a8fee9f846aa
+Merge: 9216612 33e375a
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 14:08:23 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 9216612942eaca1b1ba49e4f32475f211cddad31
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 14:02:24 2024 -0400
+
+    - Implemented a total_expenses method which returns the sum of the expenses within the provided expense list
+
+commit 33e375a9f8b8b76523713e4e413803e96c01914c
+Author: hhp26 <hhp26@cornell.edu>
+Date:   Tue Mar 26 13:54:05 2024 -0400
+
+    Delete .DS_Store
+
+commit adb098d748a716c44ff0939d452bf3f513a4adfc
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 13:52:54 2024 -0400
+
+    - Added get_expenses method which allows you to get a list of expenses that given a certain category or date
+
+commit d78f0e52f963d73473ad790f5f7468fc4edd8293
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 11:59:39 2024 -0400
+
+    Fix implementation bug with date
+    Ilia Raiszadeh (ipr6)
+
+commit 4451ddb60ce68d4aeedbb30036a4f6a2af153faf
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 11:55:58 2024 -0400
+
+    Added date field to expense record
+    Ilia Raiszadeh (ipr6)
+
+commit 65cdb84d7467d5a775e06170ba6a44d106cdcffc
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 10:59:47 2024 -0400
+
+    Implement expense data structure
+    Ilia Raiszadeh(ipr6)
+    
+    - created compilation unit with basic operation for expenses
+    - added main function for testing
+
+commit 5359a9e505f010d623aba0909239217c2d6a798c
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 09:39:44 2024 -0400
+
+    Initial commit
+
+commit 4620e2e726aeed72bfbc63b908cd9e5e90265f42
+Author: fpk24 <13404+fpk24@users.noreply.github.coecis.cornell.edu>
+Date:   Thu Mar 14 20:56:29 2024 -0400
+
+    Update readme.txt
+
+commit 49a2a63d922b51105f9dfe3980879e5018a92d38
+Author: jj575 <14643+jj575@users.noreply.github.coecis.cornell.edu>
+Date:   Wed Mar 13 17:24:28 2024 -0400
+
+    Update readme.txt
+
+commit bbdf38789736f9d508401e32d1f9268827d9d610
+Author: hhp26 <hhp26@cornell.edu>
+Date:   Wed Mar 13 14:33:43 2024 -0400
+
+    Update readme.txt
+
+commit 09b37250e65b5a9cfa71d713297af15f608aef48
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed Mar 13 12:33:10 2024 -0400
+
+    Update README
+
+commit 43a9ffec7883011f1603474eb12554bdaaf8dece
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed Mar 13 11:45:51 2024 -0400
+
+    Initial commit
