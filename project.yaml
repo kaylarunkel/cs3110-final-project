@@ -1,0 +1,26 @@
+---
+group:
+  - name: Ilia Raiszadeh
+    netid: ipr6
+  - name: Harsh Patel
+    netid: hhp26
+  - name: Kayla Runkel
+    netid: kmr227
+  - name: Joonseok Jung
+    netid: jj575
+  - name: Flynn Kelleher
+    netid: fpk24
+pm:
+  name: Allen Wu
+  netid: axw4
+publish: false
+title: "OCaml Expense Tracker
+git-repo: "https://github.coecis.cornell.edu/ipr6/cs3110-final-project"
+demo-video-url: ""
+# Write a short, attention-grabbing description of your project.
+desc: >
+  Our project is an expense tracker. It supports adding expenses with descriptions,
+  categories, dates, and of course amounts of the expense. Users can then look
+  at their total expenses, view past expenses, and look in certain categories
+  or date ranges. In addition, support for loading in and writing to csv files
+  has been implemented.
