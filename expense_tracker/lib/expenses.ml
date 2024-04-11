@@ -44,7 +44,9 @@ let read_expenses_from_csv (filename : string) : expense_list =
 let save_expenses_to_csv (filename : string) (list : expense_list) : unit =
   let oc = open_out filename in
   List.iter
-    (fun exp -> Printf.fprintf oc "%s,%.2f\n" exp.description exp.amount)
+    (fun exp ->
+      Printf.fprintf oc "%s, %s, %.2f, %s\n" exp.description exp.category
+        exp.amount exp.date)
     list;
   close_out oc
 
