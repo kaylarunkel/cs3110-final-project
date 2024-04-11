@@ -14,8 +14,8 @@ let add_expense (list : expense_list) (description : string) (category : string)
 let view_expenses (list : expense_list) : unit =
   List.iter
     (fun exp ->
-      Printf.printf "Description: %s, Category: %s, Amount: %.2f\n"
-        exp.description exp.category exp.amount)
+      Printf.printf "Description: %s, Category: %s, Amount: %.2f, Date: %s\n"
+        exp.description exp.category exp.amount exp.date)
     list
 
 let total_expenses (list : expense_list) : float =

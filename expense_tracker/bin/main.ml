@@ -7,7 +7,8 @@ let rec main (list : expense_list) : unit =
   Printf.printf "2. View Expenses\n";
   Printf.printf "3. Total Expenses\n";
   Printf.printf "4. Read Expenses from CSV\n";
-  Printf.printf "5. Exit\n";
+  Printf.printf "5. Export Expenses to CSV\n";
+  Printf.printf "6. Exit\n";
   Printf.printf "Choose an option: ";
 
   match read_int () with
@@ -35,7 +36,12 @@ let rec main (list : expense_list) : unit =
       let new_list = read_expenses_from_csv filename in
       Printf.printf "Expenses read from CSV file.\n";
       main new_list
-  | 5 -> Printf.printf "Exiting...\n"
+  | 5 ->
+      Printf.printf "Enter desired file name (include .csv ending please): ";
+      let filename = read_line () in
+      save_expenses_to_csv filename list;
+      main list
+  | 6 -> Printf.printf "Exiting...\n"
   | _ ->
       Printf.printf "Invalid option\n";
       main list
