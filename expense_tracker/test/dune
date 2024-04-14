@@ -1,2 +1,5 @@
 (test
- (name test_expense_tracker))
+ (name test_expense_tracker)
+ (libraries expense_tracker ounit2 csv)
+ (deps
+  (glob_files *.csv)))
