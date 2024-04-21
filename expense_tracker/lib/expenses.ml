@@ -52,3 +52,28 @@ let save_expenses_to_csv (filename : string) (list : expense_list) : unit =
 
 let get_expenses (list : expense_list) (criteria : string) : expense_list =
   List.filter (fun exp -> exp.category = criteria || exp.date = criteria) list
+
+let get_categories (expenses : expense_list) : string list =
+  let rec collect_categories seen expenses =
+    match expenses with
+    | [] -> seen
+    | { category; _ } :: rest ->
+        if List.mem category seen then collect_categories seen rest
+        else collect_categories (category :: seen) rest
+  in
+  collect_categories [] expenses
+
+let amount_by_category (expenses : expense_list) (categories : string list) =
+  let initial_totals = List.map (fun _ -> 0.0) categories in
+  let category_with_amount = List.combine categories initial_totals in
+  let update_totals total_to_update expense =
+    let amount =
+      List.assoc expense.category total_to_update +. expense.amount
+    in
+    List.map
+      (fun (category, category_amount) ->
+        if category = expense.category then (category, amount)
+        else (category, category_amount))
+      total_to_update
+  in
+  List.fold_left update_totals category_with_amount expenses
