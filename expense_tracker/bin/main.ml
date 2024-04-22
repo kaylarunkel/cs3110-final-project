@@ -32,8 +32,7 @@ let rec main (list : expense_list) : unit =
       main list
   | 4 ->
       Printf.printf "Enter the CSV file name: ";
-      let input = read_line () in
-      let filename = input in
+      let filename = read_line () in
       let new_list = read_expenses_from_csv filename in
       Printf.printf "Expenses read from CSV file.\n";
       main new_list
