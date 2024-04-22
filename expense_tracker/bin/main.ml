@@ -1,5 +1,4 @@
 open Expense_tracker.Expenses
-open Expense_tracker.Interface
 open Expense_tracker.Pie
 
 let rec main (list : expense_list) : unit =
@@ -32,9 +31,9 @@ let rec main (list : expense_list) : unit =
       Printf.printf "Total Expenses: %.2f\n" (total_expenses list);
       main list
   | 4 ->
-      window ();
       Printf.printf "Enter the CSV file name: ";
-      let filename = !input_text in
+      let input = read_line () in
+      let filename = input in
       let new_list = read_expenses_from_csv filename in
       Printf.printf "Expenses read from CSV file.\n";
       main new_list
