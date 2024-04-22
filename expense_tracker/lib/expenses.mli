@@ -53,3 +53,26 @@ val get_categories : expense_list -> string list
 val amount_by_category : expense_list -> string list -> (string * float) list
 (** [amount_by_category expenses categories] is the total expenses for each
     category *)
+
+val expenses_by_date_range : expense_list -> string -> string -> expense list
+(** [expenses_by_date_range expenses start_date end_date] is the list of
+    expenses that fall into the given date range
+
+    REQUIRES: that the format of the dates inputed into the [date] attribute of
+    the records be in the form YYYY-MM-DD
+
+    REQUIRES: that the format of the [start_date] and [end_date] be in the form
+    YYYY-MM-DD *)
+
+val expenses_above : expense_list -> float -> expense list
+(** [expenses_above expenses floor] is the list of expenses that are above a
+    certain specified floor value *)
+
+val expenses_below : expense_list -> float -> expense list
+(** [expenses_above expenses ceiling] is the list of expenses that are below a
+    certain specified ceiling value *)
+
+val expenses_between_ammounts : expense_list -> float -> float -> expense list
+(** [expenses_between_ammounts expenses floor ceiling] is the list of expenses
+    that are above a certain specified floor value and above a certain specified
+    ceiling value*)

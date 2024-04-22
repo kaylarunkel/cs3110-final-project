@@ -77,3 +77,21 @@ let amount_by_category (expenses : expense_list) (categories : string list) =
       total_to_update
   in
   List.fold_left update_totals category_with_amount expenses
+
+let expenses_by_date_range (expenses : expense list) (start_date : string)
+    (end_date : string) : expense list =
+  assert (start_date.[4] = '-');
+  assert (start_date.[7] = '-');
+  assert (end_date.[4] = '-');
+  assert (end_date.[7] = '-');
+  List.filter (fun x -> start_date <= x.date && end_date >= x.date) expenses
+
+let expenses_above (expenses : expense list) (floor : float) =
+  List.filter (fun x -> x.amount >= floor) expenses
+
+let expenses_below (expenses : expense list) (ceiling : float) =
+  List.filter (fun x -> x.amount <= ceiling) expenses
+
+let expenses_between_ammounts (expenses : expense list) (floor : float)
+    (ceiling : float) =
+  List.filter (fun x -> floor <= x.amount && ceiling >= x.amount) expenses
