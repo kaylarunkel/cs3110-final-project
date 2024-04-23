@@ -43,7 +43,7 @@ let draw_pie_chart_with_labels (values : float list) (labels : string array) :
     ignore (read_key ());
     (* Close the graphics window *)
     close_graph ()
-  with Graphics.Graphic_failure _ -> ()
+  with Graphics.Graphic_failure _ -> close_graph ()
 (* Ignore Graphic_failure exception *)
 
 let get_pie_data (amounts : (string * float) list) =

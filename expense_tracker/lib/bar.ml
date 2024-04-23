@@ -28,4 +28,4 @@ let draw_bar_graph year_amount_list =
     ignore (read_key ());
     (* Close the graphics window *)
     close_graph ()
-  with Graphics.Graphic_failure _ -> ()
+  with Graphics.Graphic_failure _ -> close_graph ()
