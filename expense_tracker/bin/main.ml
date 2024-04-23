@@ -1,5 +1,6 @@
 open Expense_tracker.Expenses
 open Expense_tracker.Pie
+open Expense_tracker.Bar
 
 let rec main (list : expense_list) : unit =
   Printf.printf "\nExpense Tracker\n";
@@ -44,12 +45,17 @@ let rec main (list : expense_list) : unit =
   | 6 -> (
       Printf.printf "Choose how you would like to analyze your expenses: \n";
       Printf.printf "1. View Pie Chart of Expenses per Category\n";
+      Printf.printf "2. View Bar Graph of Yearly Expenses\n";
       Printf.printf "Choose an option: ";
       match read_int () with
       | 1 ->
           let categories = get_categories list in
           let data = get_pie_data (amount_by_category list categories) in
           draw_pie_chart_with_labels data (Array.of_list categories);
+          main list
+      | 2 ->
+          let yearly_amounts = total_expenses_per_year list in
+          draw_bar_graph yearly_amounts;
           main list
       | _ ->
           Printf.printf "Invalid option\n";
