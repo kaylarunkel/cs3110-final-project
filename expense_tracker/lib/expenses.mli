@@ -76,3 +76,16 @@ val expenses_between_ammounts : expense_list -> float -> float -> expense list
 (** [expenses_between_ammounts expenses floor ceiling] is the list of expenses
     that are above a certain specified floor value and above a certain specified
     ceiling value*)
+
+val get_year : string -> string
+(** [get_year date] is the year from [date]
+
+    REQUIRES: that the format of [date] is MM/DD/YYYY *)
+
+val total_expenses_per_year : expense_list -> (string * float) list
+(** [total_expenses_per_year expenses] is the list of the total amounts spent in
+    each year *)
+
+val sorted_by_year : (string * float) list -> (string * float) list
+(** [sorted_by_year years_with_amounts] is the years and their amounts sorted by
+    year in ascending order *)

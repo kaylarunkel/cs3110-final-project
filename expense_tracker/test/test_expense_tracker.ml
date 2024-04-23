@@ -78,6 +78,23 @@ let expenses_tests =
              (amount_by_category
                 [ expense1; expense2; expense3 ]
                 (get_categories [ expense1; expense2; expense3 ])) );
+         ("get year" >:: fun _ -> assert_equal "2024" (get_year "4/23/2024"));
+         ( "get expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2024", 20.0) ]
+             (total_expenses_per_year [ expense0 ]) );
+         ( "get expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2023", 125.99); ("2024", 20.0) ]
+             (total_expenses_per_year [ expense0; expense2 ]) );
+         ( "get expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2023", 125.99); ("2024", 20.0) ]
+             (total_expenses_per_year [ expense2; expense0 ]) );
+         ( "get expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2023", 125.99); ("2024", 74.50) ]
+             (total_expenses_per_year [ expense2; expense0; expense3 ]) );
        ]
 
 let pie_tests =

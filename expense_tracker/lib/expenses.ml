@@ -95,3 +95,29 @@ let expenses_below (expenses : expense list) (ceiling : float) =
 let expenses_between_ammounts (expenses : expense list) (floor : float)
     (ceiling : float) =
   List.filter (fun x -> floor <= x.amount && ceiling >= x.amount) expenses
+
+let get_year (date : string) : string =
+  let parts = String.split_on_char '/' date in
+  match parts with
+  | [ _; _; year ] -> year
+  | _ -> failwith "Invalid date format"
+
+let sorted_by_year (years_with_amounts : (string * float) list) =
+  List.sort
+    (fun (year1, _) (year2, _) -> int_of_string year1 - int_of_string year2)
+    years_with_amounts
+
+let total_expenses_per_year (expenses : expense_list) : (string * float) list =
+  let rec group_by_year acc = function
+    | [] -> acc
+    | expense :: rest ->
+        let year = get_year expense.date in
+        let total =
+          match List.assoc_opt year acc with
+          | Some total -> total +. expense.amount
+          | None -> expense.amount
+        in
+        let updated_acc = (year, total) :: List.remove_assoc year acc in
+        group_by_year updated_acc rest
+  in
+  sorted_by_year (group_by_year [] expenses)
