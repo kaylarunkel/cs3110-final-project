@@ -59,10 +59,10 @@ val expenses_by_date_range : expense_list -> string -> string -> expense list
     expenses that fall into the given date range
 
     REQUIRES: that the format of the dates inputed into the [date] attribute of
-    the records be in the form YYYY-MM-DD
+    the records be in the form MM/DD/YYYY
 
     REQUIRES: that the format of the [start_date] and [end_date] be in the form
-    YYYY-MM-DD *)
+    MM/DD/YYYY *)
 
 val expenses_above : expense_list -> float -> expense list
 (** [expenses_above expenses floor] is the list of expenses that are above a
