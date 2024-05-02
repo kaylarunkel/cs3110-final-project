@@ -151,3 +151,11 @@ let total_expenses_per_year (expenses : expense_list) : (string * float) list =
         group_by_year updated_acc rest
   in
   sorted_by_year (group_by_year [] expenses)
+
+let get_expense_by_year (list : expense_list) (year : string) : expense list =
+  let get_year_from_date date =
+    match String.split_on_char '/' date with
+    | [ _; _; year ] -> year
+    | _ -> failwith "invalid date"
+  in
+  List.filter (fun expense -> get_year_from_date expense.date = year) list

@@ -89,3 +89,7 @@ val total_expenses_per_year : expense_list -> (string * float) list
 val sorted_by_year : (string * float) list -> (string * float) list
 (** [sorted_by_year years_with_amounts] is the years and their amounts sorted by
     year in ascending order *)
+
+val get_expense_by_year : expense_list -> string -> expense_list
+(**[get_expense_by_year list year] is the list of expenses incurred in the
+   particular year*)

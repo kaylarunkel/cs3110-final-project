@@ -135,8 +135,13 @@ let rec main (list : expense_list) : unit =
       begin
         match read_int () with
         | 1 ->
-            let categories = get_categories list in
-            let data = get_pie_data (amount_by_category list categories) in
+            Printf.printf "Which year's expenses would you like to see: ";
+            let year = read_line () in
+            let specific_year_list = get_expense_by_year list year in
+            let categories = get_categories specific_year_list in
+            let data =
+              get_pie_data (amount_by_category specific_year_list categories)
+            in
             draw_pie_chart_with_labels data (Array.of_list categories);
             main list
         | 2 ->
