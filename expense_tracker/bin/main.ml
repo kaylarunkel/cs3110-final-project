@@ -163,6 +163,7 @@ let rec main list =
   and handle_category category list =
     match category with
     | "View Exp." ->
+        open_graph "";
         view_expenses list;
         main list
     | "Total Exp." ->
@@ -201,8 +202,12 @@ let rec main list =
         && click_y >= initial_y
         && click_y <= initial_y + 50
       then begin
+        open_graph "";
+        let textbox_for_year_pie = open_textbox_with_prompt "Year (YYYY)" in
+        close_graph ();
         let categories = get_categories list in
-        let data = get_pie_data (amount_by_category list categories) in
+        let year_expenses = get_expense_by_year list textbox_for_year_pie in
+        let data = get_pie_data (amount_by_category year_expenses categories) in
         draw_pie_chart_with_labels data (Array.of_list categories);
         main list
       end
