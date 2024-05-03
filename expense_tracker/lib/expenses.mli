@@ -59,10 +59,10 @@ val expenses_by_date_range : expense_list -> string -> string -> expense list
     expenses that fall into the given date range
 
     REQUIRES: that the format of the dates inputed into the [date] attribute of
-    the records be in the form YYYY-MM-DD
+    the records be in the form MM/DD/YYYY
 
     REQUIRES: that the format of the [start_date] and [end_date] be in the form
-    YYYY-MM-DD *)
+    MM/DD/YYYY *)
 
 val expenses_above : expense_list -> float -> expense list
 (** [expenses_above expenses floor] is the list of expenses that are above a
@@ -89,3 +89,7 @@ val total_expenses_per_year : expense_list -> (string * float) list
 val sorted_by_year : (string * float) list -> (string * float) list
 (** [sorted_by_year years_with_amounts] is the years and their amounts sorted by
     year in ascending order *)
+
+val get_expense_by_year : expense_list -> string -> expense_list
+(**[get_expense_by_year list year] is the list of expenses incurred in the
+   particular year*)

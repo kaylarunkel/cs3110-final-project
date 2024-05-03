@@ -80,11 +80,38 @@ let amount_by_category (expenses : expense_list) (categories : string list) =
 
 let expenses_by_date_range (expenses : expense list) (start_date : string)
     (end_date : string) : expense list =
-  assert (start_date.[4] = '-');
-  assert (start_date.[7] = '-');
-  assert (end_date.[4] = '-');
-  assert (end_date.[7] = '-');
-  List.filter (fun x -> start_date <= x.date && end_date >= x.date) expenses
+  assert (
+    String.length start_date = 10
+    && start_date.[2] = '/'
+    && start_date.[5] = '/');
+  assert (
+    String.length end_date = 10 && end_date.[2] = '/' && end_date.[5] = '/');
+
+  let parse_date date_str =
+    try
+      let parts = String.split_on_char '/' (String.trim date_str) in
+      let year = int_of_string (List.nth parts 2) in
+      let month = int_of_string (List.nth parts 0) in
+      let day = int_of_string (List.nth parts 1) in
+      (year, month, day)
+    with Failure _ as e ->
+      Printf.printf "Failed to parse date string: %s\n" date_str;
+      raise e
+  in
+
+  let is_in_range expense =
+    let start_year, start_month, start_day = parse_date start_date in
+    let end_year, end_month, end_day = parse_date end_date in
+    let expense_year, expense_month, expense_day = parse_date expense.date in
+    let start_date = (start_year * 10000) + (start_month * 100) + start_day in
+    let end_date = (end_year * 10000) + (end_month * 100) + end_day in
+    let expense_date =
+      (expense_year * 10000) + (expense_month * 100) + expense_day
+    in
+    start_date <= expense_date && expense_date <= end_date
+  in
+
+  List.filter is_in_range expenses
 
 let expenses_above (expenses : expense list) (floor : float) =
   List.filter (fun x -> x.amount >= floor) expenses
@@ -97,6 +124,9 @@ let expenses_between_ammounts (expenses : expense list) (floor : float)
   List.filter (fun x -> floor <= x.amount && ceiling >= x.amount) expenses
 
 let get_year (date : string) : string =
+  let date = String.trim date in
+  if String.length date <> 10 || date.[2] <> '/' || date.[5] <> '/' then
+    failwith "Invalid date format";
   let parts = String.split_on_char '/' date in
   match parts with
   | [ _; _; year ] -> year
@@ -121,3 +151,11 @@ let total_expenses_per_year (expenses : expense_list) : (string * float) list =
         group_by_year updated_acc rest
   in
   sorted_by_year (group_by_year [] expenses)
+
+let get_expense_by_year (list : expense_list) (year : string) : expense list =
+  let get_year_from_date date =
+    match String.split_on_char '/' date with
+    | [ _; _; year ] -> year
+    | _ -> failwith "invalid date"
+  in
+  List.filter (fun expense -> get_year_from_date expense.date = year) list
