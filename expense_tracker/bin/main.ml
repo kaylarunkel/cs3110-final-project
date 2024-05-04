@@ -5,6 +5,8 @@ open Expense_tracker.Button
 open Expense_tracker.Textbox
 open Graphics
 
+let current = ref 0
+
 let draw_buttons_with_positions categories initial_x initial_y button_width
     button_height button_spacing =
   let rec draw_buttons_aux x y = function
@@ -35,6 +37,71 @@ let rec find_clicked_button x y initial_x initial_y button_width button_height
         let next_x = initial_x + button_width + button_spacing in
         find_clicked_button x y next_x initial_y button_width button_height
           button_spacing rest
+
+let rec up_or_down () =
+  let ev = wait_next_event [ Key_pressed; Button_down ] in
+  match ev with
+  | { key = 's' | 'S'; _ } ->
+      current := !current + 1;
+      0
+  | { key = 'w' | 'W'; _ } ->
+      current := max (!current - 1) 0;
+      0
+  | { button = true; _ } -> 1
+  | _ -> up_or_down ()
+
+let display_view_expenses_screen list =
+  open_graph "800x600";
+  moveto 10 400;
+  draw_string "DESCRIPTION";
+  moveto 210 400;
+  draw_string "CATEGORY";
+  moveto 410 400;
+  draw_string "AMOUNT";
+  moveto 510 400;
+  draw_string "DATE";
+  let draw_entry x y expense =
+    moveto x y;
+    draw_string expense.description;
+    moveto (x + 200) y;
+    draw_string expense.category;
+    moveto (x + 400) y;
+    draw_string (string_of_float expense.amount);
+    moveto (x + 500) y;
+    draw_string expense.date
+  in
+  let rec draw_entries x y start acc lst =
+    match lst with
+    | [] -> ()
+    | expense :: rest ->
+        if start > 0 then draw_entries x y (start - 1) acc rest
+        else if acc < 10 then (
+          draw_entry x y expense;
+          draw_entries x (y - 30) start (acc + 1) rest)
+  in
+  draw_entries 10 370 !current 0 list;
+  moveto 10 50;
+  draw_string "<Press [w]- up or [s]- down to see other rows>";
+  let rec check_up_down () =
+    if up_or_down () = 0 then (
+      clear_graph ();
+      moveto 10 400;
+      draw_string "DESCRIPTION";
+      moveto 210 400;
+      draw_string "CATEGORY";
+      moveto 410 400;
+      draw_string "AMOUNT";
+      moveto 510 400;
+      draw_string "DATE";
+      draw_entries 10 370 !current 0 list;
+      moveto 10 50;
+      draw_string "<Press [w]- up or [s]- down to see other rows>";
+      check_up_down ())
+  in
+  check_up_down ();
+  synchronize ();
+  ignore (wait_next_event [ Button_down ]);
+  close_graph ()
 
 let display_total_expenses_screen list =
   open_graph " 800x600";
@@ -112,67 +179,6 @@ let add_expense list =
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
-let draw_expenses expenses scroll_y =
-  let rec draw_items y = function
-    | [] -> ()
-    | expense :: rest when y > 0 ->
-        moveto 50 y;
-        draw_string
-          (expense.description ^ " (" ^ expense.category ^ "): "
-          ^ string_of_float expense.amount
-          ^ "$ on " ^ expense.date);
-        draw_items (y - 20) rest
-    | _ :: rest -> draw_items (y - 20) rest
-  in
-  clear_graph ();
-  let rec drop_n n lst =
-    if n = 0 then lst
-    else
-      match lst with
-      | [] -> []
-      | _ :: rest -> drop_n (n - 1) rest
-  in
-  let visible_expenses = drop_n scroll_y expenses in
-  draw_items 580 visible_expenses
-
-let scroll_step = 1
-
-let draw_scroll_buttons () =
-  (* Draw up arrow button *)
-  moveto 765 55;
-  lineto 775 70;
-  lineto 755 70;
-  lineto 765 55;
-  fill_poly [| (765, 70); (775, 70); (755, 70) |];
-  (* Draw down arrow button *)
-  moveto 765 515;
-  lineto 775 500;
-  lineto 755 500;
-  lineto 765 515;
-  fill_poly [| (765, 500); (775, 500); (755, 500) |]
-
-let rec handle_scroll expenses scroll_y =
-  clear_graph ();
-  draw_expenses expenses scroll_y;
-  draw_scroll_buttons ();
-  let ev = wait_next_event [ Button_down; Key_pressed ] in
-  if ev.keypressed && ev.key = 'q' then ()
-  else
-    match ev with
-    | { mouse_x = x; mouse_y = y; button; _ } ->
-        if button then
-          if x >= 755 && x <= 775 then
-            (* Check if clicked within the up arrow button *)
-            if y >= 500 && y <= 515 then
-              handle_scroll expenses (max 0 (scroll_y - scroll_step))
-              (* Check if clicked within the down arrow button *)
-            else if y >= 55 && y <= 70 then
-              handle_scroll expenses
-                (min (List.length expenses - 1) (scroll_y + scroll_step))
-            else handle_scroll expenses scroll_y
-          else handle_scroll expenses scroll_y
-        else handle_scroll expenses scroll_y
-
 let rec main list =
   let categories =
     [
@@ -224,10 +230,7 @@ let rec main list =
   and handle_category category list =
     match category with
     | "View Exp." ->
-        close_graph ();
-        open_graph " 800x600";
-        handle_scroll list 0;
-        (*synchronize (); ignore (wait_next_event [ Button_down ]);*)
+        display_view_expenses_screen list;
         main list
     | "Total Exp." ->
         display_total_expenses_screen list;
