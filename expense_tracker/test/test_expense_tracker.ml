@@ -1,6 +1,7 @@
 open OUnit
 open Expense_tracker.Expenses
 open Expense_tracker.Pie
+open Expense_tracker.Textbox
 
 let expense0 =
   {
@@ -110,5 +111,13 @@ let pie_tests =
                    (get_categories [ expense1; expense0 ]))) );
        ]
 
+let textbox_tests =
+  "test suite for textbox"
+  >::: [
+         ( "create textbox" >:: fun _ ->
+           assert_equal { content = ""; cursor_pos = 0 } (create_textbox ()) );
+       ]
+
 let _ = run_test_tt_main expenses_tests
 let _ = run_test_tt_main pie_tests
+let _ = run_test_tt_main textbox_tests
