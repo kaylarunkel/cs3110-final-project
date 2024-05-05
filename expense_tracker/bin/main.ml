@@ -47,61 +47,69 @@ let rec up_or_down () =
   | { key = 'w' | 'W'; _ } ->
       current := max (!current - 1) 0;
       0
-  | { button = true; _ } -> 1
   | _ -> up_or_down ()
+
+let money_string amount =
+  let num = String.index_from amount 0 '.' in
+  let len = String.length amount in
+  if num + 1 = len then amount ^ "00"
+  else if num + 2 = len then amount ^ "0"
+  else amount
 
 let display_view_expenses_screen list =
   open_graph "800x600";
-  moveto 10 400;
-  draw_string "DESCRIPTION";
-  moveto 210 400;
-  draw_string "CATEGORY";
-  moveto 410 400;
-  draw_string "AMOUNT";
-  moveto 510 400;
-  draw_string "DATE";
-  let draw_entry x y expense =
-    moveto x y;
-    draw_string expense.description;
-    moveto (x + 200) y;
-    draw_string expense.category;
-    moveto (x + 400) y;
-    draw_string (string_of_float expense.amount);
-    moveto (x + 500) y;
-    draw_string expense.date
-  in
-  let rec draw_entries x y start acc lst =
-    match lst with
-    | [] -> ()
-    | expense :: rest ->
-        if start > 0 then draw_entries x y (start - 1) acc rest
-        else if acc < 10 then (
-          draw_entry x y expense;
-          draw_entries x (y - 30) start (acc + 1) rest)
-  in
-  draw_entries 10 370 !current 0 list;
-  moveto 10 50;
-  draw_string "<Press [w]- up or [s]- down to see other rows>";
-  let rec check_up_down () =
-    if up_or_down () = 0 then (
-      clear_graph ();
-      moveto 10 400;
-      draw_string "DESCRIPTION";
-      moveto 210 400;
-      draw_string "CATEGORY";
-      moveto 410 400;
-      draw_string "AMOUNT";
-      moveto 510 400;
-      draw_string "DATE";
-      draw_entries 10 370 !current 0 list;
-      moveto 10 50;
-      draw_string "<Press [w]- up or [s]- down to see other rows>";
-      check_up_down ())
-  in
-  check_up_down ();
-  synchronize ();
-  ignore (wait_next_event [ Button_down ]);
-  close_graph ()
+  try
+    moveto 10 400;
+    draw_string "DESCRIPTION";
+    moveto 210 400;
+    draw_string "CATEGORY";
+    moveto 410 400;
+    draw_string "AMOUNT ($)";
+    moveto 510 400;
+    draw_string "DATE";
+    let draw_entry x y expense =
+      moveto x y;
+      draw_string expense.description;
+      moveto (x + 200) y;
+      draw_string expense.category;
+      moveto (x + 400) y;
+      draw_string (money_string (string_of_float expense.amount));
+      moveto (x + 500) y;
+      draw_string expense.date
+    in
+    let rec draw_entries x y start acc lst =
+      match lst with
+      | [] -> ()
+      | expense :: rest ->
+          if start > 0 then draw_entries x y (start - 1) acc rest
+          else if acc < 10 then (
+            draw_entry x y expense;
+            draw_entries x (y - 30) start (acc + 1) rest)
+    in
+    draw_entries 10 370 !current 0 list;
+    moveto 10 50;
+    draw_string "<Press [w]- up or [s]- down to see other rows>";
+    let rec check_up_down () =
+      if up_or_down () = 0 then (
+        clear_graph ();
+        moveto 10 400;
+        draw_string "DESCRIPTION";
+        moveto 210 400;
+        draw_string "CATEGORY";
+        moveto 410 400;
+        draw_string "AMOUNT";
+        moveto 510 400;
+        draw_string "DATE";
+        draw_entries 10 370 !current 0 list;
+        moveto 10 50;
+        draw_string "<Press [w]- up or [s]- down to see other rows>";
+        check_up_down ())
+    in
+    check_up_down ();
+    synchronize ();
+    ignore (wait_next_event [ Button_down ]);
+    close_graph ()
+  with Graphic_failure _ -> close_graph ()
 
 let display_total_expenses_screen list =
   open_graph " 800x600";
