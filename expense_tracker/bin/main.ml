@@ -38,16 +38,16 @@ let rec find_clicked_button x y initial_x initial_y button_width button_height
         find_clicked_button x y next_x initial_y button_width button_height
           button_spacing rest
 
-let rec up_or_down () =
+let rec up_or_down len =
   let ev = wait_next_event [ Key_pressed; Button_down ] in
   match ev with
   | { key = 's' | 'S'; _ } ->
-      current := !current + 1;
+      current := min (!current + 1) (len - 10);
       0
   | { key = 'w' | 'W'; _ } ->
       current := max (!current - 1) 0;
       0
-  | _ -> up_or_down ()
+  | _ -> up_or_down len
 
 let money_string amount =
   let num = String.index_from amount 0 '.' in
@@ -90,7 +90,7 @@ let display_view_expenses_screen list =
     moveto 10 50;
     draw_string "<Press [w]- up or [s]- down to see other rows>";
     let rec check_up_down () =
-      if up_or_down () = 0 then (
+      if up_or_down (List.length list) = 0 then (
         clear_graph ();
         moveto 10 400;
         draw_string "DESCRIPTION";
