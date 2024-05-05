@@ -102,7 +102,7 @@ let display_view_expenses_screen list =
         draw_string "DATE";
         draw_entries 10 370 !current 0 list;
         moveto 10 50;
-        draw_string "<Press [w]- up or [s]- down to see other rows>";
+        draw_string "<Press\n  [w]- up or [s]- down to see other rows>";
         check_up_down ())
     in
     check_up_down ();
@@ -179,11 +179,11 @@ let open_textbox_with_prompt prompt =
   input
 
 let add_expense list =
-  let description = open_textbox_with_prompt "Enter description:" in
+  let description = open_textbox_with_prompt "Enter\n  description:" in
   let category = open_textbox_with_prompt "Enter category:" in
   let amount_str = open_textbox_with_prompt "Enter amount:" in
   let amount = float_of_string amount_str in
-  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
+  let date = open_textbox_with_prompt "Enter date\n  (MM/DD/YYYY):" in
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
@@ -246,7 +246,7 @@ let rec main list =
     | "Read Exp." ->
         let filename = open_textbox_with_prompt "Enter CSV filename:" in
         let new_list = read_expenses_from_csv filename in
-        Printf.printf "Expenses read from CSV file.\n";
+        Printf.printf "Expenses read from CSV\n  file.\n";
         main new_list
     | "Save Exp." ->
         let filename = open_textbox_with_prompt "Enter filename to save:" in
@@ -277,12 +277,35 @@ let rec main list =
         && click_y <= initial_y + 50
       then begin
         open_graph "";
-        let textbox_for_year_pie = open_textbox_with_prompt "Year (YYYY)" in
+        let textbox_for_year_pie =
+          open_textbox_with_prompt
+            ("Year- choose from (" ^ possible_years list ^ ")")
+        in
         close_graph ();
-        let categories = get_categories list in
-        let year_expenses = get_expense_by_year list textbox_for_year_pie in
-        let data = get_pie_data (amount_by_category year_expenses categories) in
-        draw_pie_chart_with_labels data (Array.of_list categories);
+        if
+          List.mem
+            (int_of_string textbox_for_year_pie)
+            (possible_years_list list)
+        then
+          let categories = get_categories list in
+          let year_expenses = get_expense_by_year list textbox_for_year_pie in
+          let data =
+            get_pie_data (amount_by_category year_expenses categories)
+          in
+          draw_pie_chart_with_labels data (Array.of_list categories)
+        else (
+          open_graph "";
+          let msg =
+            "No data exists for the year you inputted (wait 3 seconds)"
+          in
+          let get_size_x (msg, _) = msg in
+          let get_size_y (_, msg) = msg in
+          moveto
+            ((size_x () - get_size_x (text_size msg)) / 2)
+            ((size_y () - get_size_y (text_size msg)) / 2);
+          draw_string msg;
+          Unix.sleep 3;
+          close_graph ());
         main list
       end
       else if

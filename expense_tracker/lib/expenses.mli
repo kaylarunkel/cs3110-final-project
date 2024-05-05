@@ -93,3 +93,9 @@ val sorted_by_year : (string * float) list -> (string * float) list
 val get_expense_by_year : expense_list -> string -> expense_list
 (**[get_expense_by_year list year] is the list of expenses incurred in the
    particular year*)
+
+val possible_years : expense_list -> string
+(** [possible_years] is a string of all years in the data, separated by commas. *)
+
+val possible_years_list : expense_list -> int list
+(** [possible_years_list] is an int list containing all the years in the data. *)

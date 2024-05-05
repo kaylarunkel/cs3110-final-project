@@ -1,5 +1,10 @@
 open Graphics
 
+let choose_colour max_value value =
+  rgb 255
+    (255 - int_of_float (255. *. value /. max_value))
+    (255 - int_of_float (255. *. value /. max_value))
+
 let x_label_length label =
   match text_size label with
   | i, _ -> i
@@ -8,6 +13,7 @@ let draw_bar x y width height color total year =
   set_color color;
   fill_rect x y width height;
   set_color black;
+  draw_rect x y width height;
   moveto
     (x + ((width - x_label_length (string_of_int total)) / 2))
     (y + height + 5);
@@ -30,7 +36,9 @@ let draw_bar_graph year_amount_list =
       | (year, total) :: rest ->
           let bar_height = int_of_float (total *. scale_factor) in
           let total = int_of_float total in
-          draw_bar x 100 bar_width bar_height (rgb 173 216 230) total year;
+          draw_bar x 100 bar_width bar_height
+            (choose_colour max_value (float_of_int total))
+            total year;
           draw (x + bar_width) rest
       (* Increased spacing between bars *)
     in

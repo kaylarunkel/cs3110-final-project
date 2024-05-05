@@ -159,3 +159,22 @@ let get_expense_by_year (list : expense_list) (year : string) : expense list =
     | _ -> failwith "invalid date"
   in
   List.filter (fun expense -> get_year_from_date expense.date = year) list
+
+let possible_years (list : expense_list) =
+  let lst = total_expenses_per_year list in
+  let rec concat acc lst =
+    match lst with
+    | [] -> acc
+    | (h, _) :: [] -> acc ^ h
+    | (h, _) :: t -> concat (acc ^ h ^ ", ") t
+  in
+  concat "" lst
+
+let possible_years_list (list : expense_list) =
+  let lst = total_expenses_per_year list in
+  let rec recreate acc lst =
+    match lst with
+    | [] -> acc
+    | (h, _) :: t -> recreate (int_of_string h :: acc) t
+  in
+  recreate [] lst
