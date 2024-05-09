@@ -268,7 +268,7 @@ let rec main list =
       let event = wait_next_event [ Button_down ] in
       let click_x = event.mouse_x in
       let click_y = event.mouse_y in
-      let initial_x = (size_x () - 320) / 2 in
+      let initial_x = (size_x () - 470) / 2 in
       let initial_y = (size_y () - 50) / 2 in
       if
         click_x >= initial_x
@@ -316,6 +316,24 @@ let rec main list =
       then begin
         let yearly_amounts = total_expenses_per_year list in
         draw_bar_graph yearly_amounts;
+        main list
+      end
+      else if
+        click_x >= initial_x + 150 + 20 + 150 + 20
+        && click_x <= initial_x + 150 + 20 + 150 + 20 + 150
+        && click_y >= initial_y
+        && click_y <= initial_y + 50
+      then begin
+        open_graph "";
+        let msg = "Budget info coming soon! (wait 3 seconds)" in
+        let get_size_x (msg, _) = msg in
+        let get_size_y (_, msg) = msg in
+        moveto
+          ((size_x () - get_size_x (text_size msg)) / 2)
+          ((size_y () - get_size_y (text_size msg)) / 2);
+        draw_string msg;
+        Unix.sleep 3;
+        close_graph ();
         main list
       end
       else handle_analyze_click ()

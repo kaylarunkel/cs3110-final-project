@@ -52,10 +52,10 @@ let draw_analyze_buttons () =
   let button_width = 150 in
   let button_height = 50 in
   let button_spacing = 20 in
-  let total_buttons_width = (button_width * 2) + button_spacing in
-  let initial_x = (Graphics.size_x () - total_buttons_width) / 2 in
+  let total_buttons_width = (button_width * 3) + button_spacing in
+  let initial_x = (Graphics.size_x () - total_buttons_width) / 3 in
   let y = (Graphics.size_y () - button_height) / 2 in
-  let texts = [ "Pie Chart"; "Bar Graph" ] in
+  let texts = [ "Pie Chart"; "Bar Graph"; "Budget" ] in
   let rec draw_buttons x = function
     | [] -> ()
     | text :: rest ->
