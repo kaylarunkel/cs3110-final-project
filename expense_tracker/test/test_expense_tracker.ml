@@ -99,6 +99,18 @@ let expenses_tests =
            assert_equal
              [ ("2023", 125.99); ("2024", 74.50) ]
              (total_expenses_per_year [ expense2; expense0; expense3 ]) );
+         ( "format money string" >:: fun _ ->
+           assert_equal "3.00" (money_string "3.") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "12.00" (money_string "12.") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "14.50" (money_string "14.5") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "120.00" (money_string "120.0") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "0.00" (money_string "0.") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "0.50" (money_string "0.50") );
        ]
 
 let pie_tests =

@@ -99,3 +99,6 @@ val possible_years : expense_list -> string
 
 val possible_years_list : expense_list -> int list
 (** [possible_years_list] is an int list containing all the years in the data. *)
+
+val money_string : string -> string
+(** [money_string amount] is [amount] formatted as $XX.XX*)

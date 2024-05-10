@@ -49,12 +49,10 @@ let rec up_or_down len =
       0
   | _ -> up_or_down len
 
-let money_string amount =
-  let num = String.index_from amount 0 '.' in
-  let len = String.length amount in
-  if num + 1 = len then amount ^ "00"
-  else if num + 2 = len then amount ^ "0"
-  else amount
+(*let money_string amount = let num = String.index_from amount 0 '.' in let len
+  = String.length amount in if num + 1 = len then amount ^ "00" else if num + 2
+  = len then amount ^ "0" else amount*)
+(*this was added to expenses.ml*)
 
 let display_view_expenses_screen list =
   open_graph "800x600";

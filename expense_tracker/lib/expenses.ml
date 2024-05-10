@@ -178,3 +178,10 @@ let possible_years_list (list : expense_list) =
     | (h, _) :: t -> recreate (int_of_string h :: acc) t
   in
   recreate [] lst
+
+let money_string amount =
+  let num = String.index_from amount 0 '.' in
+  let len = String.length amount in
+  if num + 1 = len then amount ^ "00"
+  else if num + 2 = len then amount ^ "0"
+  else amount
