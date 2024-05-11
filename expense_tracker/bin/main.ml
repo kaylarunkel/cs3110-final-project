@@ -7,37 +7,6 @@ open Graphics
 
 let current = ref 0
 
-let draw_buttons_with_positions categories initial_x initial_y button_width
-    button_height button_spacing =
-  let rec draw_buttons_aux x y = function
-    | [] -> ()
-    | category :: rest ->
-        let truncated_text =
-          if String.length category > 13 then String.sub category 0 9 ^ "..."
-          else category
-        in
-        draw_button x y button_width button_height truncated_text;
-        let next_x = x + button_width + button_spacing in
-        draw_buttons_aux next_x y rest
-  in
-  draw_buttons_aux initial_x initial_y categories
-
-let rec find_clicked_button x y initial_x initial_y button_width button_height
-    button_spacing categories =
-  match categories with
-  | [] -> None
-  | category :: rest ->
-      if
-        x >= initial_x
-        && x <= initial_x + button_width
-        && y >= initial_y
-        && y <= initial_y + button_height
-      then Some category
-      else
-        let next_x = initial_x + button_width + button_spacing in
-        find_clicked_button x y next_x initial_y button_width button_height
-          button_spacing rest
-
 let rec up_or_down len =
   let ev = wait_next_event [ Key_pressed; Button_down ] in
   match ev with
@@ -48,11 +17,6 @@ let rec up_or_down len =
       current := max (!current - 1) 0;
       0
   | _ -> up_or_down len
-
-(*let money_string amount = let num = String.index_from amount 0 '.' in let len
-  = String.length amount in if num + 1 = len then amount ^ "00" else if num + 2
-  = len then amount ^ "0" else amount*)
-(*this was added to expenses.ml*)
 
 let display_view_expenses_screen list =
   open_graph "800x600";
@@ -197,28 +161,19 @@ let rec main list =
       "Exit";
     ]
   in
+  let analyze_categories = [ "Pie Chart"; "Bar Graph"; "Budget" ] in
   open_graph "";
 
   let button_spacing = 20 in
-  let max_text_length =
-    List.fold_left
-      (fun acc category -> max acc (String.length category))
-      0 categories
-  in
   let max_button_height = 50 in
   let button_height = min max_button_height (size_y ()) in
-  let available_space =
-    size_x () - ((List.length categories + 1) * button_spacing)
-  in
-  let max_button_width = available_space / List.length categories in
   let initial_x = button_spacing in
   let initial_y = (size_y () - button_height) / 2 in
 
   let button_width =
-    min max_button_width (max_text_length * 10)
+    button_size categories button_spacing
     (* Adjusted button width *)
   in
-
   draw_buttons_with_positions categories initial_x initial_y button_width
     button_height button_spacing;
 
@@ -266,36 +221,55 @@ let rec main list =
       let event = wait_next_event [ Button_down ] in
       let click_x = event.mouse_x in
       let click_y = event.mouse_y in
-      let initial_x = (size_x () - 470) / 2 in
-      let initial_y = (size_y () - 50) / 2 in
-      if
-        click_x >= initial_x
-        && click_x <= initial_x + 150
-        && click_y >= initial_y
-        && click_y <= initial_y + 50
-      then begin
-        open_graph "";
-        let textbox_for_year_pie =
-          open_textbox_with_prompt
-            ("Year- choose from (" ^ possible_years list ^ ")")
-        in
-        close_graph ();
-        if
-          List.mem
-            (int_of_string textbox_for_year_pie)
-            (possible_years_list list)
-        then
-          let categories = get_categories list in
-          let year_expenses = get_expense_by_year list textbox_for_year_pie in
-          let data =
-            get_pie_data (amount_by_category year_expenses categories)
-          in
-          draw_pie_chart_with_labels data (Array.of_list categories)
-        else (
+      let button_width = button_size analyze_categories button_spacing in
+      let a_clicked_button =
+        find_clicked_button click_x click_y initial_x initial_y button_width
+          button_height button_spacing analyze_categories
+      in
+      match a_clicked_button with
+      | Some a_category -> handle_a_category a_category list
+      | None -> check_click ()
+    and handle_a_category a_category list =
+      match a_category with
+      | "Pie Chart" ->
           open_graph "";
-          let msg =
-            "No data exists for the year you inputted (wait 3 seconds)"
+          let textbox_for_year_pie =
+            open_textbox_with_prompt
+              ("Year- choose from (" ^ possible_years list ^ ")")
           in
+          close_graph ();
+          if
+            List.mem
+              (int_of_string textbox_for_year_pie)
+              (possible_years_list list)
+          then
+            let categories = get_categories list in
+            let year_expenses = get_expense_by_year list textbox_for_year_pie in
+            let data =
+              get_pie_data (amount_by_category year_expenses categories)
+            in
+            draw_pie_chart_with_labels data (Array.of_list categories)
+          else (
+            open_graph "";
+            let msg =
+              "No data exists for the year you inputted (wait 3 seconds)"
+            in
+            let get_size_x (msg, _) = msg in
+            let get_size_y (_, msg) = msg in
+            moveto
+              ((size_x () - get_size_x (text_size msg)) / 2)
+              ((size_y () - get_size_y (text_size msg)) / 2);
+            draw_string msg;
+            Unix.sleep 3;
+            close_graph ());
+          main list
+      | "Bar Graph" ->
+          let yearly_amounts = total_expenses_per_year list in
+          draw_bar_graph yearly_amounts;
+          main list
+      | "Budget" ->
+          open_graph "";
+          let msg = "Budget info coming soon! (wait 3 seconds)" in
           let get_size_x (msg, _) = msg in
           let get_size_y (_, msg) = msg in
           moveto
@@ -303,42 +277,12 @@ let rec main list =
             ((size_y () - get_size_y (text_size msg)) / 2);
           draw_string msg;
           Unix.sleep 3;
-          close_graph ());
-        main list
-      end
-      else if
-        click_x >= initial_x + 150 + 20
-        && click_x <= initial_x + 150 + 20 + 150
-        && click_y >= initial_y
-        && click_y <= initial_y + 50
-      then begin
-        let yearly_amounts = total_expenses_per_year list in
-        draw_bar_graph yearly_amounts;
-        main list
-      end
-      else if
-        click_x >= initial_x + 150 + 20 + 150 + 20
-        && click_x <= initial_x + 150 + 20 + 150 + 20 + 150
-        && click_y >= initial_y
-        && click_y <= initial_y + 50
-      then begin
-        open_graph "";
-        let msg = "Budget info coming soon! (wait 3 seconds)" in
-        let get_size_x (msg, _) = msg in
-        let get_size_y (_, msg) = msg in
-        moveto
-          ((size_x () - get_size_x (text_size msg)) / 2)
-          ((size_y () - get_size_y (text_size msg)) / 2);
-        draw_string msg;
-        Unix.sleep 3;
-        close_graph ();
-        main list
-      end
-      else handle_analyze_click ()
+          close_graph ();
+          main list
+      | _ -> handle_analyze_click ()
     in
     handle_analyze_click ()
   in
-
   check_click ()
 
 let () = main []
