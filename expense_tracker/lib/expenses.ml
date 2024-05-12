@@ -185,3 +185,16 @@ let money_string amount =
   if num + 1 = len then amount ^ "00"
   else if num + 2 = len then amount ^ "0"
   else amount
+
+let calculate_budget_with_bank_balance income bank_balance risky =
+  let savings_amount = if risky then 0.1 *. income else 0.2 *. income in
+  let remaining_income = income -. savings_amount in
+  let available_funds = bank_balance +. remaining_income in
+  max 0.0 available_funds
+
+let calculate_budget_with_zero_income_and_bank_balance bank_balance risky =
+  let savings_amount =
+    if risky then 0.1 *. bank_balance else 0.2 *. bank_balance
+  in
+  let remaining_funds = bank_balance -. savings_amount in
+  max 0.0 remaining_funds
