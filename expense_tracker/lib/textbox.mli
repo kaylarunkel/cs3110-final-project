@@ -19,3 +19,5 @@ val handle_key_press : textbox -> char -> unit
 val read_textbox_input : unit -> string
 (** Opens a graphics window and allows the user to input text into a textbox.
     Returns the entered text. *)
+
+val open_textbox_with_prompt : string -> string
