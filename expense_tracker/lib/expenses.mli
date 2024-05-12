@@ -101,4 +101,13 @@ val possible_years_list : expense_list -> int list
 (** [possible_years_list] is an int list containing all the years in the data. *)
 
 val money_string : string -> string
-(** [money_string amount] is [amount] formatted as $XX.XX*)
+(** [money_string amount] is [amount] formatted as $XX.XX *)
+
+val calculate_budget_with_bank_balance : float -> float -> bool -> float
+(** [calculate_budget_with_bank_balance income bank_balance risky] is the
+    recommended budget for the user given their [income], [bank_balance], and
+    desire to be [risky] *)
+
+val calculate_budget_with_zero_income_and_bank_balance : float -> bool -> float
+(** [calculate_budget_with_zero_income_and_bank_balance bank_balance risky] is
+    the budget calculated when the user has no income *)

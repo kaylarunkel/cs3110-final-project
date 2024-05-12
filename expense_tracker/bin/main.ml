@@ -232,15 +232,42 @@ let rec main list =
           main list
       | "Budget" ->
           open_graph "";
-          auto_synchronize true;
-          let msg = "Budget info coming soon! (wait 3 seconds)" in
-          let get_size_x (msg, _) = msg in
-          let get_size_y (_, msg) = msg in
-          moveto
-            ((size_x () - get_size_x (text_size msg)) / 2)
-            ((size_y () - get_size_y (text_size msg)) / 2);
-          draw_string msg;
-          Unix.sleep 3;
+          (*auto_synchronize true; let msg = "Budget info coming soon! (wait 3
+            seconds)" in let get_size_x (msg, _) = msg in let get_size_y (_,
+            msg) = msg in moveto ((size_x () - get_size_x (text_size msg)) / 2)
+            ((size_y () - get_size_y (text_size msg)) / 2); draw_string msg;
+            Unix.sleep 3;*)
+          let income_str =
+            open_textbox_with_prompt
+              "Enter your monthly income (or 0 if you have no income: )"
+          in
+          let bank_balance_str =
+            open_textbox_with_prompt
+              "Enter the amount of money currently in your bank account: "
+          in
+          let risk_preference_str =
+            open_textbox_with_prompt
+              "Are you willing to take risks with your money? (yes/no): "
+          in
+          let income = float_of_string income_str in
+          let bank_balance = float_of_string bank_balance_str in
+          let risky =
+            match String.lowercase_ascii risk_preference_str with
+            | "yes" -> true
+            | _ -> false
+          in
+          let budget =
+            if income > 0.0 then
+              calculate_budget_with_bank_balance income bank_balance risky
+            else
+              calculate_budget_with_zero_income_and_bank_balance bank_balance
+                risky
+          in
+          open_graph "";
+          draw_string
+            ("Your recommended monthly budget is: " ^ string_of_float budget);
+          synchronize ();
+          ignore (wait_next_event [ Button_down ]);
           close_graph ();
           main list
       | _ -> handle_analyze_click ()
@@ -252,7 +279,7 @@ let rec main list =
 let draw_welcome_screen () =
   open_graph "";
   set_color black;
-  moveto 200 400;
+  moveto 252 400;
   draw_string "Budget Analyzer";
 
   let button_texts = [ "Load CSV"; "New CSV" ] in
