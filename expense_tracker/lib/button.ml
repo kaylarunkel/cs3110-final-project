@@ -129,6 +129,11 @@ let button_size (categories : string list) (button_spacing : int) : int =
   let max_button_width = available_space / List.length categories in
   max_button_width
 
+let button_size_num num_categories button_spacing =
+  let available_space = size_x () - ((num_categories + 1) * button_spacing) in
+  let max_button_width = available_space / num_categories in
+  max_button_width
+
 let draw_analyze_buttons () =
   let button_height = 50 in
   let button_spacing = 20 in
@@ -144,10 +149,8 @@ let draw_buttons_in_rows (num_rows : int) (categories : string list)
     (button_spacing : int) =
   let total_buttons = List.length categories in
   let max_buttons_per_row = total_buttons / num_rows in
-  let buttons_per_row = max_buttons_per_row in
-  let button_width = (size_x () / buttons_per_row) - (2 * button_spacing) in
-  let total_button_width =
-    (buttons_per_row * button_width) + ((buttons_per_row - 1) * button_spacing)
+  let button_width =
+    button_size_num (List.length categories / num_rows) button_spacing
   in
 
   let rec take_n_elements n lst acc =
@@ -164,10 +167,7 @@ let draw_buttons_in_rows (num_rows : int) (categories : string list)
         let current_row_buttons, remaining_buttons =
           take_n_elements max_buttons_per_row buttons []
         in
-        let row_start_x =
-          initial_x
-          + ((total_button_width - (max_buttons_per_row * button_width)) / 2)
-        in
+        let row_start_x = button_spacing in
         let rec draw_row_buttons row_x = function
           | [] -> ()
           | category :: rest ->
@@ -187,7 +187,7 @@ let draw_buttons_in_rows (num_rows : int) (categories : string list)
   in
   draw_buttons_aux initial_x initial_y categories
 
-let dropdown_menu sizex sizey categories =
+let dropdown_menu sizey categories =
   let button_height = 50 in
   let button_spacing = 18 in
 
@@ -196,7 +196,9 @@ let dropdown_menu sizex sizey categories =
   let initial_x = button_spacing in
   let initial_y = sizey / 2 in
 
-  let button_width = (sizex - ((num_rows + 1) * button_spacing)) / num_rows in
+  let button_width =
+    button_size_num (List.length categories / 2) button_spacing
+  in
 
   draw_buttons_in_rows num_rows categories initial_x initial_y button_height
     button_spacing;

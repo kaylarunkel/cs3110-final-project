@@ -120,7 +120,7 @@ let add_expense list =
   let description = open_textbox_with_prompt "Enter description:" in
   let items = available_categories in
   open_graph "";
-  let category = dropdown_menu (size_x ()) (size_y ()) items in
+  let category = dropdown_menu (size_y ()) items in
   let amount_str = open_textbox_with_prompt "Enter amount:" in
   let amount = float_of_string amount_str in
   let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in

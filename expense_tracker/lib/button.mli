@@ -36,7 +36,7 @@ val button_size : string list -> int -> int
 (** [button_size categories button_spacing] is the size that each button should
     be based on the length of [categories] and the [button_spacing] *)
 
-val dropdown_menu : int -> int -> string list -> string
+val dropdown_menu : int -> string list -> string
 
 val draw_buttons_in_rows :
   int -> string list -> int -> int -> int -> int -> unit
