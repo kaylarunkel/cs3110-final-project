@@ -7,6 +7,20 @@ open Graphics
 
 let current = ref 0
 
+let available_categories =
+  [
+    "Clothing";
+    "Food";
+    "Bills";
+    "Fitness";
+    "Travel";
+    "Entertainment";
+    "Investing";
+    "Housing";
+    "Education";
+    "Miscellaneous";
+  ]
+
 let rec up_or_down len =
   let ev = wait_next_event [ Key_pressed; Button_down ] in
   match ev with
@@ -103,11 +117,13 @@ let display_total_expenses_screen list =
   with Graphic_failure _ -> close_graph ()
 
 let add_expense list =
-  let description = open_textbox_with_prompt "Enter\n  description:" in
-  let category = open_textbox_with_prompt "Enter category:" in
+  let description = open_textbox_with_prompt "Enter description:" in
+  let items = available_categories in
+  open_graph "";
+  let category = dropdown_menu (size_x ()) (size_y ()) items in
   let amount_str = open_textbox_with_prompt "Enter amount:" in
   let amount = float_of_string amount_str in
-  let date = open_textbox_with_prompt "Enter date\n  (MM/DD/YYYY):" in
+  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
