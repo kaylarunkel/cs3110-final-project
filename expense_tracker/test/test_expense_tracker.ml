@@ -111,6 +111,37 @@ let expenses_tests =
            assert_equal "0.00" (money_string "0.") );
          ( "format money string" >:: fun _ ->
            assert_equal "0.50" (money_string "0.50") );
+         ("get years from expenses" >:: fun _ -> assert_equal [] []);
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal (possible_years_list [ expense0 ]) [ 2024 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal (possible_years_list [ expense0; expense1 ]) [ 2024 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal
+             (possible_years_list [ expense0; expense2 ])
+             [ 2024; 2023 ] );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [] (get_expense_by_year [ expense0 ] "2022") );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0 ] (get_expense_by_year [ expense0 ] "2024")
+         );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (get_expense_by_year [ expense0; expense1 ] "2024") );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (get_expense_by_year [ expense0; expense2 ] "2024") );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal [ ("2022", 30.0) ] (sorted_by_year [ ("2022", 30.0) ])
+         );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2022", 30.0); ("2023", 45.5) ]
+             (sorted_by_year [ ("2022", 30.0); ("2023", 45.5) ]) );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2022", 30.0); ("2023", 45.5) ]
+             (sorted_by_year [ ("2023", 45.5); ("2022", 30.0) ]) );
        ]
 
 let pie_tests =
