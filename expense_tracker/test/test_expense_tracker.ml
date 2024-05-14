@@ -38,6 +38,17 @@ let expense3 =
 let expenses_tests =
   "test suite for expenses"
   >::: [
+         ( "check expenses" >:: fun _ ->
+           assert_equal "Breakfast with friends" expense3.description );
+         ("check expenses" >:: fun _ -> assert_equal "Food" expense3.category);
+         ("check expenses" >:: fun _ -> assert_equal 54.50 expense3.amount);
+         ("check expenses" >:: fun _ -> assert_equal "04/21/2024" expense3.date);
+         ( "check expenses" >:: fun _ ->
+           assert_equal "Board games" expense2.description );
+         ( "check expenses" >:: fun _ ->
+           assert_equal "Entertainment" expense2.category );
+         ("check expenses" >:: fun _ -> assert_equal 125.99 expense2.amount);
+         ("check expenses" >:: fun _ -> assert_equal "02/12/2023" expense2.date);
          ( "add expense to empty list" >:: fun _ ->
            assert_equal [ expense1 ]
              (add_expense [] "Dinner" "Food" 20.0 "04/13/2024") );
@@ -111,6 +122,104 @@ let expenses_tests =
            assert_equal "0.00" (money_string "0.") );
          ( "format money string" >:: fun _ ->
            assert_equal "0.50" (money_string "0.50") );
+         ("get years from expenses" >:: fun _ -> assert_equal [] []);
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal (possible_years_list [ expense0 ]) [ 2024 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal (possible_years_list [ expense0; expense1 ]) [ 2024 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal
+             (possible_years_list [ expense0; expense2 ])
+             [ 2024; 2023 ] );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [] (get_expense_by_year [ expense0 ] "2022") );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0 ] (get_expense_by_year [ expense0 ] "2024")
+         );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (get_expense_by_year [ expense0; expense1 ] "2024") );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (get_expense_by_year [ expense0; expense2 ] "2024") );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal [ ("2022", 30.0) ] (sorted_by_year [ ("2022", 30.0) ])
+         );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2022", 30.0); ("2023", 45.5) ]
+             (sorted_by_year [ ("2022", 30.0); ("2023", 45.5) ]) );
+         ( "sort expenses by year" >:: fun _ ->
+           assert_equal
+             [ ("2022", 30.0); ("2023", 45.5) ]
+             (sorted_by_year [ ("2023", 45.5); ("2022", 30.0) ]) );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal []
+             (expenses_by_date_range [ expense0 ] "03/12/2023" "03/15/2023") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_by_date_range [ expense0 ] "03/12/2023" "05/15/2024") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_by_date_range [ expense0; expense1 ] "03/12/2023"
+                "05/15/2024") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_by_date_range [ expense0; expense1 ] "03/12/2023"
+                "04/13/2024") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_by_date_range [ expense0; expense1 ] "04/13/2024"
+                "04/14/2024") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_by_date_range [ expense0; expense2 ] "04/13/2023"
+                "04/14/2024") );
+         ( "expenses by date" >:: fun _ ->
+           assert_equal []
+             (expenses_by_date_range [ expense0; expense2 ] "02/13/2021"
+                "01/14/2022") );
+         ( "expensess above amount value" >:: fun _ ->
+           assert_equal [] (expenses_above [ expense0 ] 10000.) );
+         ( "expensess above amount value" >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_above [ expense0 ] 20.) );
+         ( "expensess above amount value" >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_above [ expense0 ] 1.) );
+         ( "expensess above amount value" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_above [ expense0; expense1 ] 1.) );
+         ( "expensess above amount value" >:: fun _ ->
+           assert_equal [ expense2 ]
+             (expenses_above [ expense0; expense2 ] 100.) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [] (expenses_below [ expense0 ] 19.) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_below [ expense0 ] 21.) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_below [ expense0 ] 20.01) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_below [ expense0; expense1 ] 20.01) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_below [ expense0; expense2 ] 20.01) );
+         ( "expenses below amount value" >:: fun _ ->
+           assert_equal [ expense0; expense2 ]
+             (expenses_below [ expense0; expense2 ] 130.59) );
+         ( "expenses between amount values" >:: fun _ ->
+           assert_equal [] (expenses_between_ammounts [ expense0 ] 30.0 40.0) );
+         ( "expenses between amount values" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_between_ammounts [ expense0 ] 10.0 40.0) );
+         ( "expenses between amount values" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_between_ammounts [ expense0; expense1 ] 10.0 40.0) );
+         ( "expenses between amount values" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_between_ammounts [ expense0; expense2 ] 10.0 40.0) );
+         ( "expenses between amount values" >:: fun _ ->
+           assert_equal [ expense0; expense2 ]
+             (expenses_between_ammounts [ expense0; expense2 ] 10.0 400.0) );
        ]
 
 let pie_tests =
