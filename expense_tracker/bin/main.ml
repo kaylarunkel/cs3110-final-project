@@ -15,7 +15,6 @@ let available_categories =
     "Fitness";
     "Travel";
     "Entertainment";
-    "Investing";
     "Housing";
     "Education";
     "Miscellaneous";
@@ -248,40 +247,34 @@ let rec main list =
           main list
       | "Budget" ->
           open_graph "";
-          (*auto_synchronize true; let msg = "Budget info coming soon! (wait 3
-            seconds)" in let get_size_x (msg, _) = msg in let get_size_y (_,
-            msg) = msg in moveto ((size_x () - get_size_x (text_size msg)) / 2)
-            ((size_y () - get_size_y (text_size msg)) / 2); draw_string msg;
-            Unix.sleep 3;*)
-          let income_str =
-            open_textbox_with_prompt
-              "Enter your monthly income (or 0 if you have no income: )"
-          in
           let bank_balance_str =
             open_textbox_with_prompt
-              "Enter the amount of money currently in your bank account: "
+              "Enter the amount of money currently in your savings account: "
           in
+          let goal = open_textbox_with_prompt "Enter your goal: " in
+          let age = open_textbox_with_prompt "Enter you age:  " in
+
           let risk_preference_str =
             open_textbox_with_prompt
-              "Are you willing to take risks with your money? (yes/no): "
+              "Choose your danger level (Risky/Normal/Safe) "
           in
-          let income = float_of_string income_str in
+          let income_str = open_textbox_with_prompt "What is your income? " in
+
           let bank_balance = float_of_string bank_balance_str in
-          let risky =
+          let risk_profile =
             match String.lowercase_ascii risk_preference_str with
-            | "yes" -> true
-            | _ -> false
+            | "Risky" -> Risky
+            | "Normal" -> Average
+            | _ -> Safe
           in
-          let budget =
-            if income > 0.0 then
-              calculate_budget_with_bank_balance income bank_balance risky
-            else
-              calculate_budget_with_zero_income_and_bank_balance bank_balance
-                risky
-          in
+          let age = int_of_string age in
+          let retirement_goal = float_of_string goal in
+          let income = float_of_string income_str in
           open_graph "";
+          moveto 0 (size_y () / 2);
           draw_string
-            ("Your recommended monthly budget is: " ^ string_of_float budget);
+            (required_savings_per_year age risk_profile list income
+               retirement_goal bank_balance);
           synchronize ();
           ignore (wait_next_event [ Button_down ]);
           close_graph ();
