@@ -40,7 +40,6 @@ let draw_bar_graph year_amount_list =
             (choose_colour max_value (float_of_int total))
             total year;
           draw (x + bar_width) rest
-      (* Increased spacing between bars *)
     in
     set_color black;
     moveto 100 100;
@@ -56,8 +55,6 @@ let draw_bar_graph year_amount_list =
       draw_string (string_of_int (interval * i))
     done;
     draw 100 year_amount_list;
-    (* Wait for user input before closing *)
     ignore (read_key ());
-    (* Close the graphics window *)
     close_graph ()
   with Graphic_failure _ -> close_graph ()

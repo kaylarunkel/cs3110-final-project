@@ -10,6 +10,17 @@ let draw_button x y width height text =
   Graphics.moveto text_x text_y;
   Graphics.draw_string text
 
+let draw_help_button x y radius =
+  Graphics.set_color (Graphics.rgb 255 0 0);
+  Graphics.fill_circle x y radius;
+  Graphics.set_color Graphics.black;
+  Graphics.set_text_size 12;
+  let text_width = String.length "?" * 6 in
+  let text_x = x - (text_width / 2) in
+  let text_y = y - 6 in
+  Graphics.moveto text_x text_y;
+  Graphics.draw_string "?"
+
 let draw_buttons categories =
   let num_categories = List.length categories in
   let button_spacing = 20 in
@@ -47,15 +58,6 @@ let draw_buttons categories =
         draw_buttons_aux next_x y rest
   in
   draw_buttons_aux initial_x initial_y categories
-
-(*let draw_analyze_buttons () = let button_width = 150 in let button_height = 50
-  in let button_spacing = 20 in let total_buttons_width = (button_width * 3) +
-  button_spacing in let initial_x = (Graphics.size_x () - total_buttons_width) /
-  3 in let y = (Graphics.size_y () - button_height) / 2 in let texts = [ "Pie
-  Chart"; "Bar Graph"; "Budget" ] in let rec draw_buttons x = function | [] ->
-  () | text :: rest -> draw_button x y button_width button_height text; let
-  next_x = x + button_width + button_spacing in draw_buttons next_x rest in
-  draw_buttons initial_x texts*)
 
 let draw_buttons_with_positions (categories : string list) (initial_x : int)
     (initial_y : int) (button_width : int) (button_height : int)
@@ -96,6 +98,39 @@ let rec find_clicked_button (x : int) (y : int) (initial_x : int)
         in
         find_clicked_button x y next_initial_x next_initial_y button_width
           button_height button_spacing rest
+
+let rec find_clicked_button_with_circle (x : int) (y : int) (initial_x : int)
+    (initial_y : int) (button_width : int) (button_height : int)
+    (button_spacing : int) (categories : string list) circle_x circle_y
+    circle_radius =
+  let is_within_circular_button x y cx cy radius =
+    let dx = x - cx in
+    let dy = y - cy in
+    (dx * dx) + (dy * dy) <= radius * radius
+  in
+  match categories with
+  | [] -> None
+  | category :: rest ->
+      if is_within_circular_button x y circle_x circle_y circle_radius then
+        Some "Circular Button"
+      else if
+        x >= initial_x
+        && x <= initial_x + button_width
+        && y >= initial_y
+        && y <= initial_y + button_height
+      then Some category
+      else
+        let next_x = initial_x + button_width + button_spacing in
+        let next_initial_x, next_initial_y =
+          if next_x + button_width > size_x () then
+            (button_spacing, initial_y - (button_height + button_spacing))
+          else if next_x + button_width <= size_x () && next_x > size_x () then
+            (button_spacing, initial_y - (2 * (button_height + button_spacing)))
+          else (next_x, initial_y)
+        in
+        find_clicked_button_with_circle x y next_initial_x next_initial_y
+          button_width button_height button_spacing rest circle_x circle_y
+          circle_radius
 
 let find_clicked_button_rows (x : int) (y : int) (initial_x : int)
     (initial_y : int) (button_width : int) (button_height : int)
@@ -142,7 +177,11 @@ let draw_analyze_buttons () =
   let button_width = button_size texts button_spacing in
   let initial_x = button_spacing in
   draw_buttons_with_positions texts initial_x initial_y button_width
-    button_height button_spacing
+    button_height button_spacing;
+  draw_help_button
+    (size_x () - button_spacing)
+    (size_y () - button_spacing)
+    (button_spacing / 2)
 
 let draw_buttons_in_rows (num_rows : int) (categories : string list)
     (initial_x : int) (initial_y : int) (button_height : int)

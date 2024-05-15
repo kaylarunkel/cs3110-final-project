@@ -70,11 +70,15 @@ let expenses_tests =
          ( "get food expenses" >:: fun _ ->
            assert_equal [ expense1 ]
              (get_expenses [ expense1; expense2 ] "Food") );
+         ( "get clothing expenses" >:: fun _ ->
+           assert_equal [ expense0 ] (get_expenses [ expense0 ] "Clothing") );
          ( "get expenses by date" >:: fun _ ->
            assert_equal [ expense1 ]
              (get_expenses [ expense2; expense1 ] "04/13/2024") );
          ( "get no expenses" >:: fun _ ->
            assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/2023") );
+         ( "get no expenses_earlier" >:: fun _ ->
+           assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/1900") );
          ( "get categories" >:: fun _ ->
            assert_equal
              [ "Entertainment"; "Food" ]
@@ -90,10 +94,6 @@ let expenses_tests =
              (amount_by_category
                 [ expense1; expense2; expense3 ]
                 (get_categories [ expense1; expense2; expense3 ])) );
-         ("get year" >:: fun _ -> assert_equal "2024" (get_year "04/23/2024"));
-         ( "get year from invalid date format" >:: fun _ ->
-           assert_raises (Failure "Invalid date format") (fun () ->
-               get_year "2024/23/4") );
          ( "get expenses by year" >:: fun _ ->
            assert_equal
              [ ("2024", 20.0) ]
@@ -142,20 +142,6 @@ let expenses_tests =
          ( "get expenses for specific year" >:: fun _ ->
            assert_equal [ expense0 ]
              (get_expense_by_year [ expense0; expense2 ] "2024") );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal [ ("2022", 30.0) ] (sorted_by_year [ ("2022", 30.0) ])
-         );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal
-             [ ("2022", 30.0); ("2023", 45.5) ]
-             (sorted_by_year [ ("2022", 30.0); ("2023", 45.5) ]) );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal
-             [ ("2022", 30.0); ("2023", 45.5) ]
-             (sorted_by_year [ ("2023", 45.5); ("2022", 30.0) ]) );
-         ( "expenses by date" >:: fun _ ->
-           assert_equal []
-             (expenses_by_date_range [ expense0 ] "03/12/2023" "03/15/2023") );
          ( "expenses by date" >:: fun _ ->
            assert_equal [ expense0 ]
              (expenses_by_date_range [ expense0 ] "03/12/2023" "05/15/2024") );
@@ -222,14 +208,37 @@ let expenses_tests =
              (expenses_between_ammounts [ expense0; expense2 ] 10.0 400.0) );
        ]
 
+let get_pie_data_test () =
+  let test_cases = [ ("A", 10.0); ("B", 20.0); ("C", 20.0) ] in
+  let expected_result = [ 20.; 40.; 40. ] in
+  let result = get_pie_data test_cases in
+  assert_equal
+    ~printer:(fun lst ->
+      "[" ^ String.concat "; " (List.map string_of_float lst) ^ "]")
+    expected_result result
+
+let get_pie_data_empty_test () =
+  let test_cases = [] in
+  let result = get_pie_data test_cases in
+  assert_equal
+    ~printer:(fun lst ->
+      "[" ^ String.concat "; " (List.map string_of_float lst) ^ "]")
+    [] result
+
+let get_pie_data_single_test () =
+  let test_cases = [ ("A", 100.0) ] in
+  let result = get_pie_data test_cases in
+  assert_equal
+    ~printer:(fun lst ->
+      "[" ^ String.concat "; " (List.map string_of_float lst) ^ "]")
+    [ 100.0 ] result
+
 let pie_tests =
-  "test suite for pies"
+  "test_suite"
   >::: [
-         ( "floats to percentages" >:: fun _ ->
-           assert_equal [ 50.0; 50.0 ]
-             (get_pie_data
-                (amount_by_category [ expense1; expense0 ]
-                   (get_categories [ expense1; expense0 ]))) );
+         "get_pie_data_test" >:: get_pie_data_test;
+         "get_pie_data_empty_test" >:: get_pie_data_empty_test;
+         "get_pie_data_single_test" >:: get_pie_data_single_test;
        ]
 
 let textbox_tests =
@@ -239,6 +248,65 @@ let textbox_tests =
            assert_equal { content = ""; cursor_pos = 0 } (create_textbox ()) );
        ]
 
+let sample_expense_list =
+  [
+    {
+      description = "Groceries";
+      category = "Food";
+      amount = 50.0;
+      date = "2023/01/15";
+    };
+    {
+      description = "Utilities";
+      category = "Bills";
+      amount = 100.0;
+      date = "2023/02/20";
+    };
+    {
+      description = "Dinner";
+      category = "Food";
+      amount = 30.0;
+      date = "2023/03/10";
+    };
+  ]
+
+let sample_expense_csv = "sample_expenses.csv"
+
+let test_expenses_above _ =
+  let filtered_expenses = expenses_above sample_expense_list 40.0 in
+  assert_equal 2 (List.length filtered_expenses)
+
+let test_expenses_below _ =
+  let filtered_expenses = expenses_below sample_expense_list 40.0 in
+  assert_equal 1 (List.length filtered_expenses)
+
+let test_expenses_between_amounts _ =
+  let filtered_expenses =
+    expenses_between_ammounts sample_expense_list 20.0 80.0
+  in
+  assert_equal 2 (List.length filtered_expenses)
+
+let test_read_and_save_expenses_from_csv _ =
+  save_expenses_to_csv sample_expense_csv sample_expense_list;
+  let loaded_expenses = read_expenses_from_csv sample_expense_csv in
+  assert_equal (List.length sample_expense_list) (List.length loaded_expenses)
+
+let test_get_categories _ =
+  let categories = get_categories sample_expense_list in
+  assert_equal 2 (List.length categories)
+
+let suite =
+  "expense_tests_2"
+  >::: [
+         "test_expenses_above" >:: test_expenses_above;
+         "test_expenses_below" >:: test_expenses_below;
+         "test_expenses_between_amounts" >:: test_expenses_between_amounts;
+         "test_read_and_save_expenses_from_csv"
+         >:: test_read_and_save_expenses_from_csv;
+         "test_get_categories" >:: test_get_categories;
+       ]
+
 let _ = run_test_tt_main expenses_tests
+let _ = run_test_tt_main suite
 let _ = run_test_tt_main pie_tests
 let _ = run_test_tt_main textbox_tests

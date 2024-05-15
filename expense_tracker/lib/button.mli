@@ -18,6 +18,26 @@ val find_clicked_button :
 (** [find_clicked_button x y initial_x initial_y button_width button_height button_spacing categories]
     is the name of the category of the button pressed *)
 
+val draw_help_button : int -> int -> int -> unit
+(** [draw_help_buttpm x y initial_x initial_y button_width button_height button_spacing categories]
+    is the name of the category of the button pressed *)
+
+val find_clicked_button_with_circle :
+  int ->
+  int ->
+  int ->
+  int ->
+  int ->
+  int ->
+  int ->
+  string list ->
+  int ->
+  int ->
+  int ->
+  string option
+(** [find_clicked_button_with_circle x y initial_x initial_y button_width button_height button_spacing categories]
+    is the name of the category of the button pressed *)
+
 val find_clicked_button_rows :
   int ->
   int ->
