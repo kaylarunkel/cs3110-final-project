@@ -22,9 +22,27 @@ let available_categories =
     "Miscellaneous";
   ]
 
+let home_help_screen_text =
+  "Load CSV: Start with an already populated CSV of expenses.\n\
+   New CSV: Add your first expense now!"
+
+let main_help_screen_text =
+  "View Exp: View all your expenses.\n\
+   Total Exp: See the sum of your expenses.\n\
+   Read CSV: Read expenses from a CSV.\n\
+   Save Exp: Save all expenses to CSV.\n\
+   Analyze: Analyze your expenses in a pie chart, bar graph, or budget analyzer!\n\
+   Add Exp.: Add an expense to your list.\n\
+   Exit: Exit the program!"
+
+let analyse_help_screen_text =
+  "Pie Chart: View expenses from one year in a pie chart of categories.\n\
+   Bar Graph: View your expenses in a bar graph per category.\n\
+   Budget: See if you have enough for retirement!"
+
 let move_to_newline () =
   let text_size = 20 in
-  let y_increment = text_size + 2 (* Additional space for line spacing *) in
+  let y_increment = text_size + 2 in
   moveto 20 (current_y () - y_increment)
 
 let rec draw_string_newline str x y =
@@ -39,38 +57,19 @@ let rec draw_string_newline str x y =
     draw_string_newline remaining_str x y
   with Not_found -> draw_string str
 
-let draw_help_screen str =
-  open_graph "";
-  let text_size = 20 in
-  let text_font = "-*-fixed-medium-r-semicondensed--20-*-*-*-*-*-iso8859-1" in
-  set_text_size text_size;
-  set_font text_font;
-  let x = 20 in
-  let y = size_y () - 20 in
-  moveto x y;
-  let ipsum_text =
-    match str with
-    | "Home" ->
-        "Load CSV: Start with an already populated CSV of expenses.\n\
-         New CSV: Add your first expense now!"
-    | "Main" ->
-        "View Exp: View all your expenses.\n\
-         Total Exp: See the sum of your expenses.\n\
-         Read CSV: Read expenses from a CSV.\n\
-         Save Exp: Save all expenses to CSV.\n\
-         Analyze: Analyze your expenses in a pie chart, bar graph, or budget \
-         analyzer!\n\
-         Add Exp.: Add an expense to your list.\n\
-         Exit: Exit the program!"
-    | "Analyze" ->
-        "Pie Chart: View expenses from one year in a pie chart of categories.\n\
-         Bar Graph: View your expenses in a bar graph per category.\n\
-         Budget: See if you have enough for retirement!"
-    | _ -> "No help available :("
-  in
-  draw_string_newline ipsum_text x y;
-  ignore (wait_next_event [ Key_pressed; Button_down ]);
-  close_graph ()
+let resize_window_after_change new_width new_height =
+  if new_width <> !window_width || new_height <> !window_height then (
+    window_width := new_width;
+    window_height := new_height;
+    resize_window !window_width !window_height)
+
+(*let draw_help_screen str = open_graph ""; let text_size = 20 in let text_font
+  = "-*-fixed-medium-r-semicondensed--20-*-*-*-*-*-iso8859-1" in set_text_size
+  text_size; set_font text_font; let x = 20 in let y = size_y () - 20 in moveto
+  x y; let ipsum_text = match str with | "Home" -> home_help_screen_text |
+  "Main" -> main_help_screen_text | "Analyze" -> analyse_help_screen_text | _ ->
+  "No help available :(" in draw_string_newline ipsum_text x y; ignore
+  (wait_next_event [ Key_pressed; Button_down ]); close_graph ()*)
 
 let handle_view_event len =
   if key_pressed () then
@@ -121,19 +120,10 @@ let display_view_instructions () =
   draw_string "<Press [w] - up or [s] - down to see other rows>"
 
 let display_view_check_resize list =
-  let new_width = size_x () in
-  let new_height = size_y () in
-  if new_width <> !window_width || new_height <> !window_height then (
-    window_width := new_width;
-    window_height := new_height;
-    resize_window !window_width !window_height;
-    display_view_headers ();
-    draw_entries (12 * !window_height / 15) !current 0 list;
-    display_view_instructions ())
-  else (
-    display_view_headers ();
-    draw_entries (12 * !window_height / 15) !current 0 list;
-    display_view_instructions ())
+  resize_window_after_change (size_x ()) (size_y ());
+  display_view_headers ();
+  draw_entries (12 * !window_height / 15) !current 0 list;
+  display_view_instructions ()
 
 let rec view_expenses_loop list =
   try
@@ -146,6 +136,32 @@ let display_view_expenses_screen list =
   try
     open_graph "";
     view_expenses_loop list
+  with Graphic_failure _ -> close_graph ()
+
+let handle_total_event () = if key_pressed () then true else false
+
+let help_screen_check_resize str =
+  resize_window_after_change (size_x ()) (size_y ());
+  moveto (!window_width / 100) (14 * !window_height / 15);
+  let text =
+    match str with
+    | "Home" -> home_help_screen_text
+    | "Main" -> main_help_screen_text
+    | "Analyze" -> analyse_help_screen_text
+    | _ -> "No help available :("
+  in
+  draw_string_newline text (!window_width / 100) (14 * !window_height / 15)
+
+let rec help_screen_loop str =
+  try
+    help_screen_check_resize str;
+    if handle_total_event () then true else help_screen_loop str
+  with Graphic_failure _ -> false
+
+let display_help_screen str =
+  try
+    open_graph "";
+    if help_screen_loop str then close_graph ()
   with Graphic_failure _ -> close_graph ()
 
 let move_to_x_and_y x y text =
@@ -167,16 +183,8 @@ let display_total_expenses_text total_expenses_text =
   display_total_instructions ()
 
 let display_total_check_resize total_expenses_text =
-  let new_width = size_x () in
-  let new_height = size_y () in
-  if new_width <> !window_width || new_height <> !window_height then (
-    window_width := new_width;
-    window_height := new_height;
-    resize_window !window_width !window_height;
-    display_total_expenses_text total_expenses_text)
-  else display_total_expenses_text total_expenses_text
-
-let handle_total_event () = if key_pressed () then true else false
+  resize_window_after_change (size_x ()) (size_y ());
+  display_total_expenses_text total_expenses_text
 
 let rec total_expenses_loop total_expenses_text =
   try
@@ -287,7 +295,7 @@ let rec main list =
         let updated_list = add_expense list in
         main updated_list
     | "Exit" -> close_graph ()
-    | "Circular Button" -> draw_help_screen "Main"
+    | "Circular Button" -> display_help_screen "Main"
     | _ -> check_click ()
   and analyze_click list =
     let rec handle_analyze_click () =
@@ -307,7 +315,7 @@ let rec main list =
       | None -> check_click ()
     and handle_a_category a_category list =
       match a_category with
-      | "Circular Button" -> draw_help_screen "Analyze"
+      | "Circular Button" -> display_help_screen "Analyze"
       | "Pie Chart" ->
           open_graph "";
           auto_synchronize true;
@@ -436,7 +444,7 @@ let draw_welcome_screen () =
     | Some "New CSV" ->
         let updated_list = add_expense [] in
         main updated_list
-    | Some "Circular Button" -> draw_help_screen "Home"
+    | Some "Circular Button" -> display_help_screen "Home"
     | _ -> check_click ()
   in
   check_click ()
