@@ -37,6 +37,20 @@ val button_size : string list -> int -> int
     be based on the length of [categories] and the [button_spacing] *)
 
 val dropdown_menu : int -> string list -> string
+(** [dropdown_menu sizey categories] is a function that creates a dropdown menu
+    with buttons for categories. [sizey] is the vertical size of the menu.
+    [categories] is a list of strings representing the categories to be
+    displayed. The function calculates the positions and sizes of buttons based
+    on the number of categories and draws them on the screen. It then waits for
+    user input to detect which category button is clicked. *)
 
 val draw_buttons_in_rows :
   int -> string list -> int -> int -> int -> int -> unit
+(** [draw_buttons_in_rows num_rows categories initial_x initial_y button_height button_spacing]
+    draws buttons for categories in rows. [num_rows] is the number of rows to
+    display the buttons in. [categories] is a list of strings representing the
+    categories. [initial_x] is the initial x-coordinate for drawing buttons.
+    [initial_y] is the initial y-coordinate for drawing buttons. [button_height]
+    is the height of each button. [button_spacing] is the spacing between
+    buttons. The function calculates the positions and sizes of buttons based on
+    the number of categories and draws them in rows on the screen. *)

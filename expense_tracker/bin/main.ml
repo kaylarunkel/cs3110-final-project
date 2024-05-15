@@ -6,6 +6,8 @@ open Expense_tracker.Textbox
 open Graphics
 
 let current = ref 0
+let window_width = ref 600
+let window_height = ref 450
 
 let available_categories =
   [
@@ -15,105 +17,132 @@ let available_categories =
     "Fitness";
     "Travel";
     "Entertainment";
-    "Investing";
     "Housing";
     "Education";
     "Miscellaneous";
   ]
 
-let rec up_or_down len =
-  let ev = wait_next_event [ Key_pressed; Button_down ] in
-  match ev with
-  | { key = 's' | 'S'; _ } ->
-      current := min (!current + 1) (len - 10);
-      0
-  | { key = 'w' | 'W'; _ } ->
-      current := max (!current - 1) 0;
-      0
-  | _ -> up_or_down len
-
-let display_view_expenses_screen list =
-  open_graph "";
-  try
-    moveto 10 400;
-    draw_string "DESCRIPTION";
-    moveto 210 400;
-    draw_string "CATEGORY";
-    moveto 410 400;
-    draw_string "AMOUNT ($)";
-    moveto 510 400;
-    draw_string "DATE";
-    let draw_entry x y expense =
-      moveto x y;
-      draw_string expense.description;
-      moveto (x + 200) y;
-      draw_string expense.category;
-      moveto (x + 400) y;
-      draw_string (money_string (string_of_float expense.amount));
-      moveto (x + 500) y;
-      draw_string expense.date
-    in
-    let rec draw_entries x y start acc lst =
-      match lst with
-      | [] -> ()
-      | expense :: rest ->
-          if start > 0 then draw_entries x y (start - 1) acc rest
-          else if acc < 10 then (
-            draw_entry x y expense;
-            draw_entries x (y - 30) start (acc + 1) rest)
-    in
-    draw_entries 10 370 !current 0 list;
-    moveto 10 50;
-    draw_string "<Press [w]- up or [s]- down to see other rows>";
-    let rec check_up_down () =
-      if up_or_down (List.length list) = 0 then (
+let handle_view_event len =
+  if key_pressed () then
+    let ev = read_key () in
+    match ev with
+    | 's' | 'S' ->
+        current := min (!current + 1) (len - 10);
         clear_graph ();
-        moveto 10 400;
-        draw_string "DESCRIPTION";
-        moveto 210 400;
-        draw_string "CATEGORY";
-        moveto 410 400;
-        draw_string "AMOUNT";
-        moveto 510 400;
-        draw_string "DATE";
-        draw_entries 10 370 !current 0 list;
-        moveto 10 50;
-        draw_string "<Press\n  [w]- up or [s]- down to see other rows>";
-        check_up_down ())
-    in
-    check_up_down ();
-    synchronize ();
-    ignore (wait_next_event [ Button_down ]);
-    close_graph ()
+        true
+    | 'w' | 'W' ->
+        current := max (!current - 1) 0;
+        clear_graph ();
+        true
+    | _ -> false
+  else false
+
+let display_view_headers () =
+  moveto (!window_width / 100) (14 * !window_height / 15);
+  draw_string "DESCRIPTION";
+  moveto (3 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "CATEGORY";
+  moveto (6 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "AMOUNT ($)";
+  moveto (8 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "DATE"
+
+let draw_entry y expense =
+  moveto (!window_width / 100) y;
+  draw_string expense.description;
+  moveto (3 * !window_width / 10) y;
+  draw_string expense.category;
+  moveto (6 * !window_width / 10) y;
+  draw_string (money_string (string_of_float expense.amount));
+  moveto (8 * !window_width / 10) y;
+  draw_string expense.date
+
+let rec draw_entries y start acc lst =
+  match lst with
+  | [] -> ()
+  | expense :: rest ->
+      if start > 0 then draw_entries y (start - 1) acc rest
+      else if acc < 10 then (
+        draw_entry y expense;
+        draw_entries (y - (!window_height / 15)) start (acc + 1) rest)
+
+let display_view_instructions () =
+  moveto (!window_width / 100) (!window_height / 100);
+  draw_string "<Press [w] - up or [s] - down to see other rows>"
+
+let display_view_check_resize list =
+  let new_width = size_x () in
+  let new_height = size_y () in
+  if new_width <> !window_width || new_height <> !window_height then (
+    window_width := new_width;
+    window_height := new_height;
+    resize_window !window_width !window_height;
+    display_view_headers ();
+    draw_entries (12 * !window_height / 15) !current 0 list;
+    display_view_instructions ())
+  else (
+    display_view_headers ();
+    draw_entries (12 * !window_height / 15) !current 0 list;
+    display_view_instructions ())
+
+let rec view_expenses_loop list =
+  try
+    display_view_check_resize list;
+    if handle_view_event (List.length list) then display_view_check_resize list;
+    view_expenses_loop list
   with Graphic_failure _ -> close_graph ()
 
-let display_total_expenses_screen list =
-  open_graph "";
+let display_view_expenses_screen list =
   try
+    open_graph "";
+    view_expenses_loop list
+  with Graphic_failure _ -> close_graph ()
+
+let move_to_x_and_y x y text =
+  let text_width, text_height = text_size text in
+  let x_position = (x - text_width) / 2 in
+  let y_position = (y - text_height) / 2 in
+  moveto x_position y_position
+
+let display_total_instructions () =
+  let instruction = "<Press any key to exit>" in
+  move_to_x_and_y (size_x ()) (size_y () / 5) instruction;
+  draw_string instruction
+
+let display_total_expenses_text total_expenses_text =
+  clear_graph ();
+  move_to_x_and_y (size_x ()) (size_y ()) total_expenses_text;
+  draw_string total_expenses_text;
+  moveto (!window_width / 100) (!window_height / 100);
+  display_total_instructions ()
+
+let display_total_check_resize total_expenses_text =
+  let new_width = size_x () in
+  let new_height = size_y () in
+  if new_width <> !window_width || new_height <> !window_height then (
+    window_width := new_width;
+    window_height := new_height;
+    resize_window !window_width !window_height;
+    display_total_expenses_text total_expenses_text)
+  else display_total_expenses_text total_expenses_text
+
+let handle_total_event () = if key_pressed () then true else false
+
+let rec total_expenses_loop total_expenses_text =
+  try
+    display_total_check_resize total_expenses_text;
+    if handle_total_event () then true
+    else total_expenses_loop total_expenses_text
+  with Graphic_failure _ -> false
+
+let display_total_expenses_screen list =
+  try
+    open_graph "";
     let total_expenses = total_expenses list in
     let total_expenses_text =
       Printf.sprintf "Total Expenses: %.2f" total_expenses
     in
-    let rec find_font_size font_size =
-      set_font
-        (Printf.sprintf
-           "-*-fixed-medium-r-semicondensed--%d-*-*-*-*-*-iso8859-1" font_size);
-      let text_width, _ = text_size total_expenses_text in
-      if text_width > size_x () - 100 then find_font_size (font_size - 1)
-      else font_size
-    in
-    let font_size = find_font_size 100 in
-    set_font
-      (Printf.sprintf "-*-fixed-medium-r-semicondensed--%d-*-*-*-*-*-iso8859-1"
-         font_size);
-    let text_width, text_height = text_size total_expenses_text in
-    let x_position = (size_x () - text_width) / 2 in
-    let y_position = (size_y () - text_height) / 2 in
-    moveto x_position y_position;
-    draw_string total_expenses_text;
-    synchronize ();
-    ignore (wait_next_event [ Button_down ]);
-    close_graph ()
+    if total_expenses_loop total_expenses_text then close_graph ()
   with Graphic_failure _ -> close_graph ()
 
 let add_expense list =
@@ -121,7 +150,7 @@ let add_expense list =
   let items = available_categories in
   open_graph "";
   let category = dropdown_menu (size_y ()) items in
-  let amount_str = open_textbox_with_prompt "Enter amount:" in
+  let amount_str = open_textbox_with_prompt "Enter amount (must be a #):" in
   let amount = float_of_string amount_str in
   let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
   let new_expense = { description; category; amount; date } in
@@ -256,40 +285,34 @@ let rec main list =
           main list
       | "Budget" ->
           open_graph "";
-          (*auto_synchronize true; let msg = "Budget info coming soon! (wait 3
-            seconds)" in let get_size_x (msg, _) = msg in let get_size_y (_,
-            msg) = msg in moveto ((size_x () - get_size_x (text_size msg)) / 2)
-            ((size_y () - get_size_y (text_size msg)) / 2); draw_string msg;
-            Unix.sleep 3;*)
-          let income_str =
-            open_textbox_with_prompt
-              "Enter your monthly income (or 0 if you have no income: )"
-          in
           let bank_balance_str =
             open_textbox_with_prompt
-              "Enter the amount of money currently in your bank account: "
+              "Enter the amount of money currently in your savings account: "
           in
+          let goal = open_textbox_with_prompt "Enter your goal: " in
+          let age = open_textbox_with_prompt "Enter you age:  " in
+
           let risk_preference_str =
             open_textbox_with_prompt
-              "Are you willing to take risks with your money? (yes/no): "
+              "Choose your danger level (Risky/Normal/Safe) "
           in
-          let income = float_of_string income_str in
+          let income_str = open_textbox_with_prompt "What is your income? " in
+
           let bank_balance = float_of_string bank_balance_str in
-          let risky =
+          let risk_profile =
             match String.lowercase_ascii risk_preference_str with
-            | "yes" -> true
-            | _ -> false
+            | "Risky" -> Risky
+            | "Normal" -> Average
+            | _ -> Safe
           in
-          let budget =
-            if income > 0.0 then
-              calculate_budget_with_bank_balance income bank_balance risky
-            else
-              calculate_budget_with_zero_income_and_bank_balance bank_balance
-                risky
-          in
+          let age = int_of_string age in
+          let retirement_goal = float_of_string goal in
+          let income = float_of_string income_str in
           open_graph "";
+          moveto 0 (size_y () / 2);
           draw_string
-            ("Your recommended monthly budget is: " ^ string_of_float budget);
+            (required_savings_per_year age risk_profile list income
+               retirement_goal bank_balance);
           synchronize ();
           ignore (wait_next_event [ Button_down ]);
           close_graph ();
