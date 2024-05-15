@@ -35,6 +35,22 @@ let expense3 =
     date = "04/21/2024";
   }
 
+let expense4 =
+  {
+    description = "Taco Bell";
+    category = "Food";
+    amount = 40.0;
+    date = "03/23/2024";
+  }
+
+let expense5 =
+  {
+    description = "SAT";
+    category = "Education";
+    amount = 160.0;
+    date = "06/27/2024";
+  }
+
 let expenses_tests =
   "test suite for expenses"
   >::: [
@@ -220,6 +236,39 @@ let expenses_tests =
          ( "expenses between amount values" >:: fun _ ->
            assert_equal [ expense0; expense2 ]
              (expenses_between_ammounts [ expense0; expense2 ] 10.0 400.0) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Clothing", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense0 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 50.); ("Clothing", 50.) ]
+             (percentage_of_total_expenses_by_category [ expense0; expense1 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 75.); ("Clothing", 25.) ]
+             (percentage_of_total_expenses_by_category
+                [ expense0; expense1; expense4 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Education", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense5 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 20.); ("Education", 80.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense4 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 20.); ("Education", 80.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense4 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Education", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense2 ])
+         );
        ]
 
 let pie_tests =
@@ -239,6 +288,18 @@ let textbox_tests =
            assert_equal { content = ""; cursor_pos = 0 } (create_textbox ()) );
        ]
 
+let budget_tests =
+  "test suite for budget algorithm"
+  >::: [
+         ( "calculate present value for retirement" >:: fun _ ->
+           assert_equal 0. (present_value_retirement_func 0. 0. 0) );
+         ( "calculate present value for retirement" >:: fun _ ->
+           assert_equal 25. (present_value_retirement_func 100. 1. 2) );
+         ( "calculate present value for retirement" >:: fun _ ->
+           assert_equal 1. (present_value_retirement_func 1024. 3. 5) );
+       ]
+
 let _ = run_test_tt_main expenses_tests
 let _ = run_test_tt_main pie_tests
 let _ = run_test_tt_main textbox_tests
+let _ = run_test_tt_main budget_tests
