@@ -200,7 +200,7 @@ let add_expense list =
   let items = available_categories in
   open_graph "";
   let category = dropdown_menu (size_y ()) items in
-  let amount_str = open_textbox_with_prompt "Enter amount:" in
+  let amount_str = open_textbox_with_prompt "Enter amount (must be a #):" in
   let amount = float_of_string amount_str in
   let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
   let new_expense = { description; category; amount; date } in
@@ -222,6 +222,14 @@ let rec main list =
   open_graph "";
   auto_synchronize true;
 
+  set_color black;
+  (* Set color *)
+  set_text_size 30;
+  (* Set text size *)
+  moveto (size_x () - 390) (size_y () - 50);
+  (* Position the header at the top-left corner *)
+  draw_string "Welcome to Your Expense Tracker!";
+  (* Draw the header text *)
   let button_spacing = 20 in
   let max_button_height = 50 in
   let button_height = min max_button_height (size_y ()) in
@@ -382,7 +390,7 @@ let draw_welcome_screen () =
   open_graph "";
   set_color black;
   moveto 252 400;
-  draw_string "Budget Analyzer";
+  draw_string "Expense Analyzer";
 
   let button_texts = [ "Load CSV"; "New CSV" ] in
 
