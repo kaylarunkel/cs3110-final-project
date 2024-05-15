@@ -35,6 +35,8 @@ let expense3 =
     date = "04/21/2024";
   }
 
+let expense_list1 = [ expense0; expense1; expense2; expense3 ]
+
 let expenses_tests =
   "test suite for expenses"
   >::: [
@@ -631,6 +633,21 @@ let budgeting_tests =
          >:: fun _ ->
            assert_equal "You're too old partner!"
              (required_savings_per_year 65 Safe [] 1000.0 1000.0 0.0) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal "You're too old partner!"
+             (required_savings_per_year 70 Risky [] 4000.0 4000.0 0.0) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal "You are spending too much"
+             (required_savings_per_year 40 Safe expense_list1 5.0 1000.0 0.0) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal "You are spending too much"
+             (required_savings_per_year 40 Safe expense_list1 16.0 800.0 0.0) );
        ]
 
 let pie_tests =

@@ -263,23 +263,27 @@ let money_needed age risk_profile retirement_goal bank_balance =
 
 let required_savings_per_year age risk_profile budget income retirement_goal
     bank_balance =
-  if age >= 65 then "You're too old partner!"
+  if age >= 65 then
+    "You're too old partner! There's no point in tracking your budget now."
   else
     let recent_year = List.hd (possible_years_list budget) |> string_of_int in
     let budget = get_expense_by_year budget recent_year in
-    if income < total_expenses budget then "You are spending too much"
+    if income < total_expenses budget then
+      "You are spending too much relative to your income. We suggest you \
+       review your expense breakdown through the pie charts and cut back on \
+       unnecessary expenses."
     else
       let money_per_year =
         money_needed age risk_profile retirement_goal bank_balance
       in
-      print_endline "Money Needed Per Year";
+      print_endline "Money Needed Per Year: ";
       print_float money_per_year;
       let current_savings_per_year = income -. total_expenses budget in
-      print_endline "Current Savings";
+      print_endline "Current Savings: ";
       print_float current_savings_per_year;
       let difference = money_per_year -. current_savings_per_year in
       let percent_change = difference /. total_expenses budget *. 100. in
-      print_endline "Percent Change";
+      print_endline "Percent Change: ";
       print_float percent_change;
       if Float.round percent_change > 0. then
         "You have to cut your budget by "
@@ -287,4 +291,4 @@ let required_savings_per_year age risk_profile budget income retirement_goal
       else if Float.round percent_change < 0. then
         "You can raise your expenditure by "
         ^ string_of_float (Float.round percent_change)
-      else "You don't have to change a thing!"
+      else "You don't have to change a thing! You are on the right track."

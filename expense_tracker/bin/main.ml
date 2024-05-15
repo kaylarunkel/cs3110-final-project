@@ -250,7 +250,7 @@ let rec main list =
           auto_synchronize true;
           let textbox_for_year_pie =
             open_textbox_with_prompt
-              ("Year- choose from (" ^ possible_years list ^ ")")
+              ("Year - choose from (" ^ possible_years list ^ ")")
           in
           close_graph ();
           if
@@ -289,14 +289,20 @@ let rec main list =
             open_textbox_with_prompt
               "Enter the amount of money currently in your savings account: "
           in
-          let goal = open_textbox_with_prompt "Enter your goal: " in
+          let goal =
+            open_textbox_with_prompt
+              "Enter the value in your bank account you wish to retire with: "
+          in
           let age = open_textbox_with_prompt "Enter you age:  " in
 
           let risk_preference_str =
             open_textbox_with_prompt
-              "Choose your danger level (Risky/Normal/Safe) "
+              "Select the risk level at which you prefer to manage your money \
+               (Risky/Normal/Safe) "
           in
-          let income_str = open_textbox_with_prompt "What is your income? " in
+          let income_str =
+            open_textbox_with_prompt "What is your average yearly income? "
+          in
 
           let bank_balance = float_of_string bank_balance_str in
           let risk_profile =
