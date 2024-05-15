@@ -98,33 +98,51 @@ let display_view_expenses_screen list =
     view_expenses_loop list
   with Graphic_failure _ -> close_graph ()
 
-let display_total_expenses_screen list =
-  open_graph "";
+let move_to_x_and_y x y text =
+  let text_width, text_height = text_size text in
+  let x_position = (x - text_width) / 2 in
+  let y_position = (y - text_height) / 2 in
+  moveto x_position y_position
+
+let display_total_instructions () =
+  let instruction = "<Press any key to exit>" in
+  move_to_x_and_y (size_x ()) (size_y () / 5) instruction;
+  draw_string instruction
+
+let display_total_expenses_text total_expenses_text =
+  clear_graph ();
+  move_to_x_and_y (size_x ()) (size_y ()) total_expenses_text;
+  draw_string total_expenses_text;
+  moveto (!window_width / 100) (!window_height / 100);
+  display_total_instructions ()
+
+let display_total_check_resize total_expenses_text =
+  let new_width = size_x () in
+  let new_height = size_y () in
+  if new_width <> !window_width || new_height <> !window_height then (
+    window_width := new_width;
+    window_height := new_height;
+    resize_window !window_width !window_height;
+    display_total_expenses_text total_expenses_text)
+  else display_total_expenses_text total_expenses_text
+
+let handle_total_event () = if key_pressed () then true else false
+
+let rec total_expenses_loop total_expenses_text =
   try
+    display_total_check_resize total_expenses_text;
+    if handle_total_event () then true
+    else total_expenses_loop total_expenses_text
+  with Graphic_failure _ -> false
+
+let display_total_expenses_screen list =
+  try
+    open_graph "";
     let total_expenses = total_expenses list in
     let total_expenses_text =
       Printf.sprintf "Total Expenses: %.2f" total_expenses
     in
-    let rec find_font_size font_size =
-      set_font
-        (Printf.sprintf
-           "-*-fixed-medium-r-semicondensed--%d-*-*-*-*-*-iso8859-1" font_size);
-      let text_width, _ = text_size total_expenses_text in
-      if text_width > size_x () - 100 then find_font_size (font_size - 1)
-      else font_size
-    in
-    let font_size = find_font_size 100 in
-    set_font
-      (Printf.sprintf "-*-fixed-medium-r-semicondensed--%d-*-*-*-*-*-iso8859-1"
-         font_size);
-    let text_width, text_height = text_size total_expenses_text in
-    let x_position = (size_x () - text_width) / 2 in
-    let y_position = (size_y () - text_height) / 2 in
-    moveto x_position y_position;
-    draw_string total_expenses_text;
-    synchronize ();
-    ignore (wait_next_event [ Button_down ]);
-    close_graph ()
+    if total_expenses_loop total_expenses_text then close_graph ()
   with Graphic_failure _ -> close_graph ()
 
 let add_expense list =
