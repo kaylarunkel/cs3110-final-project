@@ -6,6 +6,8 @@ open Expense_tracker.Textbox
 open Graphics
 
 let current = ref 0
+let window_width = ref 600
+let window_height = ref 450
 
 let available_categories =
   [
@@ -20,70 +22,80 @@ let available_categories =
     "Miscellaneous";
   ]
 
-let rec up_or_down len =
-  let ev = wait_next_event [ Key_pressed; Button_down ] in
-  match ev with
-  | { key = 's' | 'S'; _ } ->
-      current := min (!current + 1) (len - 10);
-      0
-  | { key = 'w' | 'W'; _ } ->
-      current := max (!current - 1) 0;
-      0
-  | _ -> up_or_down len
+let handle_view_event len =
+  if key_pressed () then
+    let ev = read_key () in
+    match ev with
+    | 's' | 'S' ->
+        current := min (!current + 1) (len - 10);
+        clear_graph ();
+        true
+    | 'w' | 'W' ->
+        current := max (!current - 1) 0;
+        clear_graph ();
+        true
+    | _ -> false
+  else false
+
+let display_view_headers () =
+  moveto (!window_width / 100) (14 * !window_height / 15);
+  draw_string "DESCRIPTION";
+  moveto (3 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "CATEGORY";
+  moveto (6 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "AMOUNT ($)";
+  moveto (8 * !window_width / 10) (14 * !window_height / 15);
+  draw_string "DATE"
+
+let draw_entry y expense =
+  moveto (!window_width / 100) y;
+  draw_string expense.description;
+  moveto (3 * !window_width / 10) y;
+  draw_string expense.category;
+  moveto (6 * !window_width / 10) y;
+  draw_string (money_string (string_of_float expense.amount));
+  moveto (8 * !window_width / 10) y;
+  draw_string expense.date
+
+let rec draw_entries y start acc lst =
+  match lst with
+  | [] -> ()
+  | expense :: rest ->
+      if start > 0 then draw_entries y (start - 1) acc rest
+      else if acc < 10 then (
+        draw_entry y expense;
+        draw_entries (y - (!window_height / 15)) start (acc + 1) rest)
+
+let display_view_instructions () =
+  moveto (!window_width / 100) (!window_height / 100);
+  draw_string "<Press [w] - up or [s] - down to see other rows>"
+
+let display_view_check_resize list =
+  let new_width = size_x () in
+  let new_height = size_y () in
+  if new_width <> !window_width || new_height <> !window_height then (
+    window_width := new_width;
+    window_height := new_height;
+    resize_window !window_width !window_height;
+    display_view_headers ();
+    draw_entries (12 * !window_height / 15) !current 0 list;
+    display_view_instructions ())
+  else (
+    display_view_headers ();
+    draw_entries (12 * !window_height / 15) !current 0 list;
+    display_view_instructions ())
+
+let rec view_expenses_loop list =
+  try
+    display_view_check_resize list;
+    if handle_view_event (List.length list) then display_view_check_resize list;
+    view_expenses_loop list
+  with Graphic_failure _ -> close_graph ()
 
 let display_view_expenses_screen list =
-  open_graph "";
   try
-    moveto 10 400;
-    draw_string "DESCRIPTION";
-    moveto 210 400;
-    draw_string "CATEGORY";
-    moveto 410 400;
-    draw_string "AMOUNT ($)";
-    moveto 510 400;
-    draw_string "DATE";
-    let draw_entry x y expense =
-      moveto x y;
-      draw_string expense.description;
-      moveto (x + 200) y;
-      draw_string expense.category;
-      moveto (x + 400) y;
-      draw_string (money_string (string_of_float expense.amount));
-      moveto (x + 500) y;
-      draw_string expense.date
-    in
-    let rec draw_entries x y start acc lst =
-      match lst with
-      | [] -> ()
-      | expense :: rest ->
-          if start > 0 then draw_entries x y (start - 1) acc rest
-          else if acc < 10 then (
-            draw_entry x y expense;
-            draw_entries x (y - 30) start (acc + 1) rest)
-    in
-    draw_entries 10 370 !current 0 list;
-    moveto 10 50;
-    draw_string "<Press [w]- up or [s]- down to see other rows>";
-    let rec check_up_down () =
-      if up_or_down (List.length list) = 0 then (
-        clear_graph ();
-        moveto 10 400;
-        draw_string "DESCRIPTION";
-        moveto 210 400;
-        draw_string "CATEGORY";
-        moveto 410 400;
-        draw_string "AMOUNT";
-        moveto 510 400;
-        draw_string "DATE";
-        draw_entries 10 370 !current 0 list;
-        moveto 10 50;
-        draw_string "<Press\n  [w]- up or [s]- down to see other rows>";
-        check_up_down ())
-    in
-    check_up_down ();
-    synchronize ();
-    ignore (wait_next_event [ Button_down ]);
-    close_graph ()
+    open_graph "";
+    view_expenses_loop list
   with Graphic_failure _ -> close_graph ()
 
 let display_total_expenses_screen list =
