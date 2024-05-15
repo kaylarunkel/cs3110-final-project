@@ -158,12 +158,6 @@ let rec help_screen_loop str =
     if handle_total_event () then true else help_screen_loop str
   with Graphic_failure _ -> false
 
-let display_help_screen str =
-  try
-    open_graph "";
-    if help_screen_loop str then close_graph ()
-  with Graphic_failure _ -> close_graph ()
-
 let move_to_x_and_y x y text =
   let text_width, text_height = text_size text in
   let x_position = (x - text_width) / 2 in
@@ -174,6 +168,13 @@ let display_total_instructions () =
   let instruction = "<Press any key to exit>" in
   move_to_x_and_y (size_x ()) (size_y () / 5) instruction;
   draw_string instruction
+
+let display_help_screen str =
+  try
+    open_graph "";
+    display_total_instructions ();
+    if help_screen_loop str then close_graph ()
+  with Graphic_failure _ -> close_graph ()
 
 let display_total_expenses_text total_expenses_text =
   clear_graph ();
@@ -295,7 +296,9 @@ let rec main list =
         let updated_list = add_expense list in
         main updated_list
     | "Exit" -> close_graph ()
-    | "Circular Button" -> display_help_screen "Main"
+    | "Circular Button" ->
+        display_help_screen "Main";
+        main list
     | _ -> check_click ()
   and analyze_click list =
     let rec handle_analyze_click () =
@@ -400,7 +403,7 @@ let rec main list =
   in
   check_click ()
 
-let draw_welcome_screen () =
+let rec draw_welcome_screen () =
   open_graph "";
   set_color black;
   moveto 252 400;
@@ -444,7 +447,9 @@ let draw_welcome_screen () =
     | Some "New CSV" ->
         let updated_list = add_expense [] in
         main updated_list
-    | Some "Circular Button" -> display_help_screen "Home"
+    | Some "Circular Button" ->
+        display_help_screen "Home";
+        draw_welcome_screen ()
     | _ -> check_click ()
   in
   check_click ()
