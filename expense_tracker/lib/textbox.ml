@@ -8,6 +8,8 @@ type textbox = {
 let create_textbox () = { content = ""; cursor_pos = 0 }
 
 let draw_textbox textbox x y width height =
+  moveto (size_x () - 200) (size_y () - 200);
+
   set_color black;
   fill_rect x y width height;
   set_color white;
@@ -71,6 +73,7 @@ let read_textbox_input () =
 let open_textbox_with_prompt prompt =
   open_graph "";
   auto_synchronize true;
+
   let textbox = create_textbox () in
   let draw_input_box () =
     clear_graph ();
