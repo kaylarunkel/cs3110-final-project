@@ -333,7 +333,7 @@ let draw_welcome_screen () =
   open_graph "";
   set_color black;
   moveto 252 400;
-  draw_string "Budget Analyzer";
+  draw_string "Expense Analyzer";
 
   let button_texts = [ "Load CSV"; "New CSV" ] in
 

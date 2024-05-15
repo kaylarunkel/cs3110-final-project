@@ -37,6 +37,22 @@ let expense3 =
 
 let expense_list1 = [ expense0; expense1; expense2; expense3 ]
 
+let expense4 =
+  {
+    description = "Taco Bell";
+    category = "Food";
+    amount = 40.0;
+    date = "03/23/2024";
+  }
+
+let expense5 =
+  {
+    description = "SAT";
+    category = "Education";
+    amount = 160.0;
+    date = "06/27/2024";
+  }
+
 let expenses_tests =
   "test suite for expenses"
   >::: [
@@ -590,6 +606,39 @@ let expenses_tests =
            assert_equal
              [ ("Entertainment", 50.); ("Fashion", 0.); ("Food", 50.) ]
              (percentage_of_total_expenses_by_category expenses) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Clothing", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense0 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 50.); ("Clothing", 50.) ]
+             (percentage_of_total_expenses_by_category [ expense0; expense1 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 75.); ("Clothing", 25.) ]
+             (percentage_of_total_expenses_by_category
+                [ expense0; expense1; expense4 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Education", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense5 ]) );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 20.); ("Education", 80.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense4 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Food", 20.); ("Education", 80.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense4 ])
+         );
+         ( "percentage of expenses per category" >:: fun _ ->
+           assert_equal
+             [ ("Education", 100.) ]
+             (percentage_of_total_expenses_by_category [ expense5; expense2 ])
+         );
        ]
 
 let budgeting_tests =
