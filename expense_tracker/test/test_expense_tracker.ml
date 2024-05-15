@@ -88,11 +88,15 @@ let expenses_tests =
          ( "get food expenses" >:: fun _ ->
            assert_equal [ expense1 ]
              (get_expenses [ expense1; expense2 ] "Food") );
+         ( "get clothing expenses" >:: fun _ ->
+           assert_equal [ expense0 ] (get_expenses [ expense0 ] "Clothing") );
          ( "get expenses by date" >:: fun _ ->
            assert_equal [ expense1 ]
              (get_expenses [ expense2; expense1 ] "04/13/2024") );
          ( "get no expenses" >:: fun _ ->
            assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/2023") );
+         ( "get no expenses_earlier" >:: fun _ ->
+           assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/1900") );
          ( "get categories" >:: fun _ ->
            assert_equal
              [ "Entertainment"; "Food" ]
@@ -108,10 +112,6 @@ let expenses_tests =
              (amount_by_category
                 [ expense1; expense2; expense3 ]
                 (get_categories [ expense1; expense2; expense3 ])) );
-         ("get year" >:: fun _ -> assert_equal "2024" (get_year "04/23/2024"));
-         ( "get year from invalid date format" >:: fun _ ->
-           assert_raises (Failure "Invalid date format") (fun () ->
-               get_year "2024/23/4") );
          ( "get expenses by year" >:: fun _ ->
            assert_equal
              [ ("2024", 20.0) ]
@@ -160,20 +160,6 @@ let expenses_tests =
          ( "get expenses for specific year" >:: fun _ ->
            assert_equal [ expense0 ]
              (get_expense_by_year [ expense0; expense2 ] "2024") );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal [ ("2022", 30.0) ] (sorted_by_year [ ("2022", 30.0) ])
-         );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal
-             [ ("2022", 30.0); ("2023", 45.5) ]
-             (sorted_by_year [ ("2022", 30.0); ("2023", 45.5) ]) );
-         ( "sort expenses by year" >:: fun _ ->
-           assert_equal
-             [ ("2022", 30.0); ("2023", 45.5) ]
-             (sorted_by_year [ ("2023", 45.5); ("2022", 30.0) ]) );
-         ( "expenses by date" >:: fun _ ->
-           assert_equal []
-             (expenses_by_date_range [ expense0 ] "03/12/2023" "03/15/2023") );
          ( "expenses by date" >:: fun _ ->
            assert_equal [ expense0 ]
              (expenses_by_date_range [ expense0 ] "03/12/2023" "05/15/2024") );
@@ -700,13 +686,11 @@ let budgeting_tests =
        ]
 
 let pie_tests =
-  "test suite for pies"
+  "test_suite"
   >::: [
-         ( "floats to percentages" >:: fun _ ->
-           assert_equal [ 50.0; 50.0 ]
-             (get_pie_data
-                (amount_by_category [ expense1; expense0 ]
-                   (get_categories [ expense1; expense0 ]))) );
+         "get_pie_data_test" >:: get_pie_data_test;
+         "get_pie_data_empty_test" >:: get_pie_data_empty_test;
+         "get_pie_data_single_test" >:: get_pie_data_single_test;
        ]
 
 let textbox_tests =

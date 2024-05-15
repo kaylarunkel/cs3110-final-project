@@ -22,6 +22,56 @@ let available_categories =
     "Miscellaneous";
   ]
 
+let move_to_newline () =
+  let text_size = 20 in
+  let y_increment = text_size + 2 (* Additional space for line spacing *) in
+  moveto 20 (current_y () - y_increment)
+
+let rec draw_string_newline str x y =
+  try
+    let newline_index = String.index str '\n' in
+    let first_part = String.sub str 0 newline_index in
+    draw_string first_part;
+    move_to_newline ();
+    let remaining_str =
+      String.sub str (newline_index + 1) (String.length str - newline_index - 1)
+    in
+    draw_string_newline remaining_str x y
+  with Not_found -> draw_string str
+
+let draw_help_screen str =
+  open_graph "";
+  let text_size = 20 in
+  let text_font = "-*-fixed-medium-r-semicondensed--20-*-*-*-*-*-iso8859-1" in
+  set_text_size text_size;
+  set_font text_font;
+  let x = 20 in
+  let y = size_y () - 20 in
+  moveto x y;
+  let ipsum_text =
+    match str with
+    | "Home" ->
+        "Load CSV: Start with an already populated CSV of expenses.\n\
+         New CSV: Add your first expense now!"
+    | "Main" ->
+        "View Exp: View all your expenses.\n\
+         Total Exp: See the sum of your expenses.\n\
+         Read CSV: Read expenses from a CSV.\n\
+         Save Exp: Save all expenses to CSV.\n\
+         Analyze: Analyze your expenses in a pie chart, bar graph, or budget \
+         analyzer!\n\
+         Add Exp.: Add an expense to your list.\n\
+         Exit: Exit the program!"
+    | "Analyze" ->
+        "Pie Chart: View expenses from one year in a pie chart of categories.\n\
+         Bar Graph: View your expenses in a bar graph per category.\n\
+         Budget: See if you have enough for retirement!"
+    | _ -> "No help available :("
+  in
+  draw_string_newline ipsum_text x y;
+  ignore (wait_next_event [ Key_pressed; Button_down ]);
+  close_graph ()
+
 let handle_view_event len =
   if key_pressed () then
     let ev = read_key () in
@@ -189,15 +239,23 @@ let rec main list =
   let button_width = button_size categories button_spacing in
   draw_buttons_with_positions categories initial_x initial_y button_width
     button_height button_spacing;
+  draw_help_button
+    (size_x () - button_spacing)
+    (size_y () - button_spacing)
+    (button_spacing / 2);
 
   let rec check_click () =
     let event = wait_next_event [ Button_down ] in
     let click_x = event.mouse_x in
     let click_y = event.mouse_y in
     let clicked_button =
-      find_clicked_button click_x click_y initial_x initial_y button_width
-        button_height button_spacing categories
+      find_clicked_button_with_circle click_x click_y initial_x initial_y
+        button_width button_height button_spacing categories
+        (size_x () - button_spacing)
+        (size_y () - button_spacing)
+        (button_spacing / 2)
     in
+
     match clicked_button with
     | Some category -> handle_category category list
     | None -> check_click ()
@@ -229,6 +287,7 @@ let rec main list =
         let updated_list = add_expense list in
         main updated_list
     | "Exit" -> close_graph ()
+    | "Circular Button" -> draw_help_screen "Main"
     | _ -> check_click ()
   and analyze_click list =
     let rec handle_analyze_click () =
@@ -237,14 +296,18 @@ let rec main list =
       let click_y = event.mouse_y in
       let button_width = button_size analyze_categories button_spacing in
       let a_clicked_button =
-        find_clicked_button click_x click_y initial_x initial_y button_width
-          button_height button_spacing analyze_categories
+        find_clicked_button_with_circle click_x click_y initial_x initial_y
+          button_width button_height button_spacing analyze_categories
+          (size_x () - button_spacing)
+          (size_y () - button_spacing)
+          (button_spacing / 2)
       in
       match a_clicked_button with
-      | Some a_category -> handle_a_category a_category list
+      | Some analyze_categories -> handle_a_category analyze_categories list
       | None -> check_click ()
     and handle_a_category a_category list =
       match a_category with
+      | "Circular Button" -> draw_help_screen "Analyze"
       | "Pie Chart" ->
           open_graph "";
           auto_synchronize true;
@@ -348,7 +411,10 @@ let draw_welcome_screen () =
 
   draw_buttons_with_positions button_texts initial_x 180 button_width 30
     button_spacing;
-
+  draw_help_button
+    (size_x () - button_spacing)
+    (size_y () - button_spacing)
+    (button_spacing / 2);
   synchronize ();
 
   let rec check_click () =
@@ -356,8 +422,11 @@ let draw_welcome_screen () =
     let click_x = event.mouse_x in
     let click_y = event.mouse_y in
     match
-      find_clicked_button click_x click_y initial_x 180 button_width 30
-        button_spacing button_texts
+      find_clicked_button_with_circle click_x click_y initial_x 180 button_width
+        30 button_spacing button_texts
+        (size_x () - button_spacing)
+        (size_y () - button_spacing)
+        (button_spacing / 2)
     with
     | Some "Load CSV" ->
         let filename = open_textbox_with_prompt "Enter CSV filename:" in
@@ -367,6 +436,7 @@ let draw_welcome_screen () =
     | Some "New CSV" ->
         let updated_list = add_expense [] in
         main updated_list
+    | Some "Circular Button" -> draw_help_screen "Home"
     | _ -> check_click ()
   in
   check_click ()
