@@ -1,0 +1,642 @@
+commit 6c683b1c27b0605cb810a4c9abfae0842bb07554
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 16 10:52:26 2024 -0400
+
+    Update yaml
+
+commit 9ace4ade4681b27f85714bad76de95f987354c2d
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 16 10:50:19 2024 -0400
+
+    Testing program
+    
+    - Cleaned csv files
+    - Fixed budget percentages
+
+commit 4440bd55f852129e3de3f116466d92a91b1ea9c3
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Thu May 16 10:15:24 2024 -0400
+
+    adding 2023 to testing.csv and cleaning up some things
+
+commit 7399851f2111ab0133935eaab30fea21e72ca3a0
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 09:50:18 2024 -0400
+
+    Changed pie chart
+
+commit 5c361d06a0f12bced5b472c03e93448828e5790c
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 09:40:49 2024 -0400
+
+    Finished test cases and cleaned up functions
+
+commit 5b007eab671f358b14812d001b756c7b837b3668
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 09:09:21 2024 -0400
+
+    Added test cases and removed duplicates
+
+commit 52d4ff7ec0e4ad6ff1fb256ff0b4345f43cdca18
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 08:33:05 2024 -0400
+
+    Added test cases
+
+commit 881585d083a1ff66c396b7e3ac5ed61230d57154
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 03:04:24 2024 -0400
+
+    try catch for user input in [budget]
+
+commit 811667dddb2ca263a314a2dea673190da1d57f5a
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 02:34:07 2024 -0400
+
+    Refactor codes in [main], [bar], and [textbox]
+    
+    - Repetitive code in [textbox] fixed
+    - Each function is less than 20 lines now
+
+commit 3dcbb4cc24bd0ad6a46e53f1edf6cba732f9afb8
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 01:15:34 2024 -0400
+
+    Everything is resizable and works now
+
+commit 2a9c756d499b662023947edd4fd8e7bd850feddd
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 00:25:36 2024 -0400
+
+    Eliminate hard coding from main
+    
+    - Main function factored into smaller pieces
+    - No more hard coded numbers!
+
+commit 317ebbd3347abb55d3a4b331f68ac8668b9d17ce
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 00:07:17 2024 -0400
+
+    Undid changes so Joon can push
+
+commit ccc7acdb2b9f6ded8aa3311da69ed4639b1d421a
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Thu May 16 00:00:43 2024 -0400
+
+    Added try catch for user input
+
+commit 06984662ba5c5e52ad8e580e4678ca254c7e70ee
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Wed May 15 23:13:20 2024 -0400
+
+    Removed Help Button from Analyze Click Screen
+
+commit 5e263287f09fe1d742f9c2e964faf81a537a78cc
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Wed May 15 22:35:18 2024 -0400
+
+    closing help screen sends programme to previous screen
+
+commit da12a67816dac4c89dc56840922a534aab2a8aac
+Merge: 126dce6 79c59ac
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 21:55:55 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 126dce6ad30808f104df8201ebc9512b97f0f57c
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 21:51:04 2024 -0400
+
+    To stash
+
+commit 79c59acbd2b4890205187e3bf4568cee50ee8474
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 21:26:43 2024 -0400
+
+    more tests for budgeting and pie charts
+
+commit 7190f046e409c24ab80faea4b9ac4695f722bcaf
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 21:01:49 2024 -0400
+
+    Wrap text of Budget output
+
+commit f2057c82ed4634c7230d077e3cd2bbce12b41328
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Wed May 15 20:56:11 2024 -0400
+
+    Enable resizing of [welcome screen] and get rid of duplicate codes in [button]
+    
+    - Button functions are more unified now as one
+    - Button display screens can be resized
+    - [welcome screen] can be resized
+
+commit 1222ce987555e5173a22d94f1c0869948533b97a
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 20:33:53 2024 -0400
+
+    Fix tests
+
+commit d9e6e2cb4c56fd15b23260bca85ab49a7e8c3687
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 19:50:15 2024 -0400
+
+    Update INSTALL.txt
+
+commit 1e851cc6ec1551b5e10177d86e6d29f86d7cd2a1
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 19:40:29 2024 -0400
+
+    Exit help screen by pressing key
+
+commit 950e53cb4d4448901eca0853dba4a8fea281b556
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Wed May 15 18:29:09 2024 -0400
+
+    Enable window resizing for [help screen]
+    
+    - User can resize window, and the content will be resized accordingly
+    - Each function for [help screen] are now of appropriate length and not repetitive.
+
+commit cbc8d74b5b9187dcab6b5ed1eef7652a6d88284f
+Merge: d259ae1 e04261d
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 17:14:20 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit d259ae13cdab56a2a9f2c6bba38122ab47e4327f
+Merge: e9efcc8 9e51cd1
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 17:14:02 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit e04261dda62af8cb8009e91cb23333ac3a5a8100
+Merge: e544f94 9e51cd1
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Wed May 15 17:12:39 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit e544f9440282a202404ac8c7be3085bf756c220e
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Wed May 15 17:11:20 2024 -0400
+
+    Added Help Button
+
+commit e9efcc86e2295d2d4049c867aad934c440d8ab2d
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 17:10:17 2024 -0400
+
+    some tests on budget functions and made the prompts a bit more detailed
+
+commit 9e51cd1383c4d86a4da8d8e66fd124afd8ce528b
+Merge: 93d0e8a cd56a4e
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 17:08:47 2024 -0400
+
+    Merge tests
+
+commit 93d0e8a421416861e909a033cf139e7dd05464d7
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed May 15 17:01:58 2024 -0400
+
+    Add budget and expenses tests
+
+commit cd56a4ee77540bc1533b8ecf57245ecfeea8f570
+Merge: 7fb5f3b 7c2a047
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 16:48:46 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 7fb5f3b6a78b4ad7c0f9a87b1939165febd1e103
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 15 16:48:32 2024 -0400
+
+    welcome header
+
+commit 7c2a04799440caf22786f2a4e0214cd546616acd
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed May 15 16:36:30 2024 -0400
+
+    Fixed minor bugs and added test cases
+    Ilia Raiszadeh (ipr6)
+
+commit 857fcae9e63dc11f3580b9eddf5b61eeceae031c
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed May 15 15:22:06 2024 -0400
+
+    Added full comments for all functions in .mli files
+    Ilia Raiszadeh (ipr6)
+
+commit b4febe7b62cfc2472f9cd2c9f639bfde480f7aaa
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed May 15 13:11:51 2024 -0400
+
+    Fixed bug in tests that prevented dune from building
+    Ilia Raiszadeh (ipr6)
+
+commit 80a4173d5e62c63f0c0daffb13d34279f1991175
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Wed May 15 03:28:04 2024 -0400
+
+    Enable window resizing for [total expenses]
+    
+    - User can resize window, and the content will be resized accordingly
+    - Each function for [total expenses] are now of appropriate length and not repetitive.
+
+commit 65914276941f2392fd315ca6d0ce876e88142f26
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Wed May 15 03:09:51 2024 -0400
+
+    Enable window resizing for [view expenses]
+    
+    - User can resize window, and the content will be resized accordingly
+    - Each functions for [view expenses] are now of appropriate length and not repetitive.
+
+commit 0886e568bb5ad207bfd6b6e1612e289ee8aafe55
+Merge: 353d11c 4e02a18
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Tue May 14 23:16:49 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 353d11c3bcc826a1c6939708f9f36ab1361821fc
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Tue May 14 23:16:43 2024 -0400
+
+    Added Budget Analyzer
+
+commit 4e02a18527b30915e5caacaa73bb880ecf497361
+Merge: 841af5e bf8f817
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue May 14 18:06:31 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 841af5eedbdeb23a59d088acc7ee193cf59a6a87
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue May 14 18:06:03 2024 -0400
+
+    cleaning up pie.ml file
+
+commit bf8f81745ff042aee87326b2ced4787b5cda23cf
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Mon May 13 10:54:30 2024 -0400
+
+    Add more tests
+
+commit 6150cb52969502d20f98278f4e0609fe5e22f477
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Mon May 13 10:32:42 2024 -0400
+
+    Add tests
+
+commit 0fd3c9527861fc41f8744db308546fec4c54e82a
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sun May 12 16:30:27 2024 -0400
+
+    Fix category buttons
+
+commit 49e5f909b39b533998d3bc6f1da1c3885dbdacd7
+Merge: 4b3cf93 f472fc0
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Sun May 12 15:34:08 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 4b3cf9347b34f530bb7a7ecedabfeeaf57a21ae6
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Sun May 12 15:34:02 2024 -0400
+
+    Added buttons for adding categories
+    -need to debug the find_clicked_rows
+
+commit f472fc04e77ac8b3cb376583371e4e7a60076b8a
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sun May 12 10:44:02 2024 -0400
+
+    Implement budget algorithm
+    
+    - Need to add more complexity
+    - Need to add tests
+
+commit ad3f6ba0ada0d0ccd157086e12a0780477fdae12
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Sat May 11 22:18:31 2024 -0400
+
+    Added Load Screen
+
+commit 8e60e0b3b82c25865911a02a7681c0437aee5155
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sat May 11 16:07:56 2024 -0400
+
+    Work on cleaning main
+    
+    - Move some functions to button.ml
+    - Use pattern matching for analyze buttons
+
+commit 2315d78364253788ac777f2584237684f3ba438a
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 9 20:19:24 2024 -0400
+
+    Clean code
+    
+    - Add tests
+    - Add comments
+
+commit bb5ba85bf2cb591a117665546ced4bf37adf50cb
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 9 19:54:42 2024 -0400
+
+    Add budget button under Analyze button
+
+commit 2d5536a21a603b77ffef28fd787b5f8b8509d18a
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Sun May 5 00:55:12 2024 -0400
+
+    Improve pie and bar chart
+    
+    - Colours added to show differences in bar charts
+    - Pie chart shows possible years to choose from
+    - Incorrect input for year has its own screen
+
+commit 4ab0b8fce6be7d135d5153eb2d479900c0bf3e8d
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Sat May 4 22:14:51 2024 -0400
+
+    Fix bar chart y-axis to display correct numbers
+
+commit d106c53b00a1f7cd3dc398d5775fe1c8837286e7
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Sat May 4 20:55:25 2024 -0400
+
+    Add 0's for money amounts and close [view] properly
+
+commit 560bc9b8558b57e07d3671c486a51c77c5d01f3f
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Sat May 4 19:00:24 2024 -0400
+
+    alternate version [view expenses]
+
+commit 54e747fb098890984f7013bc8546e8b0f9ee11d1
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sat May 4 16:21:30 2024 -0400
+
+    View expenses in the window
+
+commit 69e27311c3d8677a6906cd22333521416d78c1f5
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Fri May 3 13:36:21 2024 -0400
+
+    adding in year selection for pie chart
+
+commit 72542d3f4e3fa7e7da72dfba449ff7a7bfca38d5
+Merge: 08c3103 a4211f2
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Fri May 3 00:05:26 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 08c310346b55a5689ed0688cca2dd53486457795
+Author: Flynn Kelleher <fpk24@cornell.edu>
+Date:   Fri May 3 00:03:05 2024 -0400
+
+    Implementing front end interface with buttons
+
+commit a4211f20a2166b748377d74a9eaf9ee38695c8a7
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Thu May 2 19:05:51 2024 -0400
+
+    Adding in viewing pie chart by year
+
+commit ddf0eb5bac28592afaa06ca9c6712301d73cf7a1
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu May 2 15:41:08 2024 -0400
+
+    Added input validation and total expenses over a range of time
+    Ilia Raiszadeh (ipr6)
+
+commit fd19e3d05d8c634d5a1b0bf80178a6270487c9fa
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Thu May 2 11:46:29 2024 -0400
+
+    updated bar chart, updated pie chart, new testing.csv
+
+commit dfcbfc7828133ad8bab33c1c6cfe3a620d126fd6
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 1 21:28:14 2024 -0400
+
+    Reimplemented the bar.ml file to add some more visual features
+
+commit dd6004fa3377ed8e582812cc829b3e271e8d0821
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Wed May 1 19:59:47 2024 -0400
+
+    remove bogue from dune file
+
+commit 80dbe20402f47895dff0d02b1480ffb2f563e35c
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Tue Apr 23 16:29:56 2024 -0400
+
+    Fix buggy graphs
+    
+    - Can now view graphic multiple times
+
+commit 7f0c8c5ac4f087bbd8957daa833fd293efa0a810
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Tue Apr 23 14:48:23 2024 -0400
+
+    Implement bar graph of yearly amounts
+    
+    - Unable to open graph after one has already been opened
+
+commit 19a4d958042cad9fc9fe6b2441ea5648bddd559d
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Tue Apr 23 14:17:58 2024 -0400
+
+    Implemented functions for amounts by year bar graph
+    
+    - Get list of total amount per year as tuple
+    - Add tests for new functions
+
+commit 0218b33883ae0c2aca7dbfdf3621097e2fb2ca04
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Mon Apr 22 17:26:58 2024 -0400
+
+    - Implemented functions to access expenses based on a date range, expenses above a certain value, expenses less than a certain value, and expenses within a range
+
+commit 9d60e07868010219437d988844f0ed028efb1070
+Merge: c28e13d a97bf61
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Mon Apr 22 15:43:09 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit c28e13dd17ba0bdcf4e6f50e9b2cee93dcf37693
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Mon Apr 22 15:35:47 2024 -0400
+
+    edits
+
+commit a97bf611baf4fddcc8081c7e4c4dd09a92772544
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Mon Apr 22 15:32:36 2024 -0400
+
+    Eliminate the use of Bogue
+    
+    - Bogue doesn't work on some macs
+
+commit 02287fa55a6ffae42cb3c98d852d9577f3834d84
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sun Apr 21 13:59:44 2024 -0400
+
+    Add pie chart functionality
+    
+    - OUnit test suite for pie chart
+    - Get categories and corresponding amounts
+    - Display pie chart in new window
+
+commit 41e8ca3b7c5948fb499d42e8e131fa86227d63aa
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Sat Apr 13 20:05:39 2024 -0400
+
+    Add OUnit test suite for expenses
+
+commit bfe1dfc8d47d7c1c1e6dfe2697b1b75b082cedd7
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu Apr 11 15:07:35 2024 -0400
+
+    Minor change to export function
+    Ilia Raiszadeh (ipr6)
+
+commit 9b5f459c18dedfe9bdd97a1c6dc2ab082d216f67
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu Apr 11 14:52:46 2024 -0400
+
+    Implement exporting to csv and fixed printing bug
+    Ilia Raiszadeh (ipr6)
+
+commit 21954f5e294be47ce27487a0058737917ff6256e
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu Mar 28 16:22:02 2024 -0400
+
+    Added error checking for incorrect filenames and gitlog file
+    Ilia Raiszadeh (ipr6)
+
+commit 8e23390fbc517f56739f27177e13f68a5595138f
+Author: ipr6 <ipr6@cornell.edu>
+Date:   Wed Mar 27 21:02:48 2024 -0400
+
+    Update yaml file
+
+commit 2a996d35003028a98965ec1ea9bfcfdac26dd51c
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed Mar 27 21:01:41 2024 -0400
+
+    Add install.txt and yaml file
+    Ilia Raiszadeh (ipr6)
+
+commit 478c4253051e6dc51d9e5789e8b7baa1223e9649
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed Mar 27 16:08:46 2024 -0400
+
+    Add interface compilation unit
+    
+    - Window opens when user wants to read from csv
+    - User enters csv name, hits enter, closes window, and now can view those expenses
+
+commit f07ac5d40cfc70ef4d00b89686c9686eaa8b44f1
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 18:58:43 2024 -0400
+
+    Removed redundant code and added testing csv file
+    Ilia Raiszadeh (ipr6)
+
+commit e04815746eccc5e79924516a9897a8fee9f846aa
+Merge: 9216612 33e375a
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 14:08:23 2024 -0400
+
+    Merge branch 'main' of github.coecis.cornell.edu:ipr6/cs3110-final-project
+
+commit 9216612942eaca1b1ba49e4f32475f211cddad31
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 14:02:24 2024 -0400
+
+    - Implemented a total_expenses method which returns the sum of the expenses within the provided expense list
+
+commit 33e375a9f8b8b76523713e4e413803e96c01914c
+Author: hhp26 <hhp26@cornell.edu>
+Date:   Tue Mar 26 13:54:05 2024 -0400
+
+    Delete .DS_Store
+
+commit adb098d748a716c44ff0939d452bf3f513a4adfc
+Author: Harsh Patel <hhp26@cornell.edu>
+Date:   Tue Mar 26 13:52:54 2024 -0400
+
+    - Added get_expenses method which allows you to get a list of expenses that given a certain category or date
+
+commit d78f0e52f963d73473ad790f5f7468fc4edd8293
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 11:59:39 2024 -0400
+
+    Fix implementation bug with date
+    Ilia Raiszadeh (ipr6)
+
+commit 4451ddb60ce68d4aeedbb30036a4f6a2af153faf
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 11:55:58 2024 -0400
+
+    Added date field to expense record
+    Ilia Raiszadeh (ipr6)
+
+commit 65cdb84d7467d5a775e06170ba6a44d106cdcffc
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 10:59:47 2024 -0400
+
+    Implement expense data structure
+    Ilia Raiszadeh(ipr6)
+    
+    - created compilation unit with basic operation for expenses
+    - added main function for testing
+
+commit 5359a9e505f010d623aba0909239217c2d6a798c
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Tue Mar 26 09:39:44 2024 -0400
+
+    Initial commit
+
+commit 4620e2e726aeed72bfbc63b908cd9e5e90265f42
+Author: fpk24 <13404+fpk24@users.noreply.github.coecis.cornell.edu>
+Date:   Thu Mar 14 20:56:29 2024 -0400
+
+    Update readme.txt
+
+commit 49a2a63d922b51105f9dfe3980879e5018a92d38
+Author: jj575 <14643+jj575@users.noreply.github.coecis.cornell.edu>
+Date:   Wed Mar 13 17:24:28 2024 -0400
+
+    Update readme.txt
+
+commit bbdf38789736f9d508401e32d1f9268827d9d610
+Author: hhp26 <hhp26@cornell.edu>
+Date:   Wed Mar 13 14:33:43 2024 -0400
+
+    Update readme.txt
+
+commit 09b37250e65b5a9cfa71d713297af15f608aef48
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Wed Mar 13 12:33:10 2024 -0400
+
+    Update README
+
+commit 43a9ffec7883011f1603474eb12554bdaaf8dece
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Wed Mar 13 11:45:51 2024 -0400
+
+    Initial commit

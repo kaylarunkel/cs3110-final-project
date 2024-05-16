@@ -248,8 +248,8 @@ let required_savings_per_year age risk_profile budget income retirement_goal
     let recent_year = List.hd (possible_years_list budget) |> string_of_int in
     let budget = get_expense_by_year budget recent_year in
     if income < total_expenses budget then
-      "You are spending too much relative to your income. We suggest youreview \
-       your expense breakdown. \n\
+      "You are spending too much relative to your income. We suggest you \
+       review your expense breakdown. \n\
       \ Check your piechart for more information."
     else
       let money_per_year =
