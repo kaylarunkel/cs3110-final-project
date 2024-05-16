@@ -47,14 +47,6 @@ let move_to_newline () =
   let y_increment = text_size + 2 in
   moveto 20 (current_y () - y_increment)
 
-let invalid_input () =
-  close_graph ();
-  open_graph "";
-  moveto (size_x () / 2) (size_y () / 2);
-  draw_string "Invalid Input...Try Again";
-  Unix.sleep 3;
-  close_graph ()
-
 let rec draw_string_newline str x y =
   try
     let newline_index = String.index str '\n' in
@@ -279,10 +271,12 @@ let rec main list =
     | "Read Exp." ->
         let filename = open_textbox_with_prompt "Enter CSV filename:" in
         let new_list = read_expenses_from_csv filename in
+        Printf.printf "Expenses read from CSV\n  file.\n";
         main new_list
     | "Save Exp." ->
         let filename = open_textbox_with_prompt "Enter filename to save:" in
         save_expenses_to_csv filename list;
+        Printf.printf "Expenses saved to CSV file.\n";
         main list
     | "Analyze" ->
         close_graph ();
@@ -355,31 +349,14 @@ let rec main list =
       | "Budget" ->
           open_graph "";
           let bank_balance_str =
-            try
-              float_of_string
-                (open_textbox_with_prompt
-                   "Enter the amount of money currently in your savings \
-                    account: ")
-            with Failure _ ->
-              invalid_input ();
-              0.0
+            open_textbox_with_prompt
+              "Enter the amount of money currently in your savings account: "
           in
           let goal =
-            try
-              float_of_string
-                (open_textbox_with_prompt
-                   "Enter the value in your bank account you wish to retire \
-                    with: ")
-            with Failure _ ->
-              invalid_input ();
-              0.0
+            open_textbox_with_prompt
+              "Enter the value in your bank account you wish to retire with: "
           in
-          let age =
-            try int_of_string (open_textbox_with_prompt "Enter you age:  ")
-            with Failure _ ->
-              invalid_input ();
-              0
-          in
+          let age = open_textbox_with_prompt "Enter you age:  " in
 
           let risk_preference_str =
             open_textbox_with_prompt
@@ -387,24 +364,24 @@ let rec main list =
                (Risky/Normal/Safe) "
           in
           let income_str =
-            try
-              float_of_string
-                (open_textbox_with_prompt "What is your average yearly income? ")
-            with Failure _ ->
-              invalid_input ();
-              0.0
+            open_textbox_with_prompt "What is your average yearly income? "
           in
+
+          let bank_balance = float_of_string bank_balance_str in
           let risk_profile =
             match String.lowercase_ascii risk_preference_str with
             | "Risky" -> Risky
             | "Normal" -> Average
             | _ -> Safe
           in
+          let age = int_of_string age in
+          let retirement_goal = float_of_string goal in
+          let income = float_of_string income_str in
           open_graph "";
           moveto 0 (size_y () / 2);
           draw_string
-            (required_savings_per_year age risk_profile list income_str goal
-               bank_balance_str);
+            (required_savings_per_year age risk_profile list income
+               retirement_goal bank_balance);
           synchronize ();
           ignore (wait_next_event [ Button_down ]);
           close_graph ();
@@ -432,6 +409,7 @@ let welcome_screen_default categories =
 let load_csv_refactored () =
   let filename = open_textbox_with_prompt "Enter CSV filename:" in
   let new_list = read_expenses_from_csv filename in
+  Printf.printf "Expenses read from CSV\n  file.\n";
   main new_list
 
 let rec welcome_screen_check_resize () =
