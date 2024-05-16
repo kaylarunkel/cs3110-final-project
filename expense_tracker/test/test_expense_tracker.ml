@@ -10,6 +10,8 @@ let expense0 =
     date = "04/13/2024";
   }
 
+let empty_expense = { description = ""; category = ""; amount = 0.0; date = "" }
+
 let expense1 =
   {
     description = "Dinner";
@@ -148,6 +150,11 @@ let expenses_tests =
   >::: [
          ( "check expenses" >:: fun _ ->
            assert_equal "Breakfast with friends" expense3.description );
+         ( "check empty expense" >:: fun _ ->
+           assert_equal "" empty_expense.description );
+         ( "check empty expense" >:: fun _ ->
+           assert_equal "" empty_expense.category );
+         ("check empty expense" >:: fun _ -> assert_equal "" empty_expense.date);
          ("check expenses" >:: fun _ -> assert_equal "Food" expense3.category);
          ("check expenses" >:: fun _ -> assert_equal 54.50 expense3.amount);
          ("check expenses" >:: fun _ -> assert_equal "04/21/2024" expense3.date);
@@ -164,6 +171,8 @@ let expenses_tests =
            assert_equal [ expense2; expense1 ]
              (add_expense [ expense1 ] "Board games" "Entertainment" 125.99
                 "02/12/2023") );
+         ( "add expense to expense list" >:: fun _ ->
+           assert_equal [ empty_expense ] (add_expense [] "" "" 0.0 "") );
          ( "total expenses when list is empty" >:: fun _ ->
            assert_equal 0.0 (total_expenses []) );
          ( "total expense with one expense" >:: fun _ ->
@@ -172,6 +181,8 @@ let expenses_tests =
            assert_equal
              (expense1.amount +. expense2.amount)
              (total_expenses [ expense1; expense2 ]) );
+         ( "total expense with zero amount" >:: fun _ ->
+           assert_equal 0.0 (total_expenses [ empty_expense ]) );
          ( "read from csv" >:: fun _ ->
            assert_equal [ expense1; expense2 ]
              (read_expenses_from_csv "testexpenses.csv") );
@@ -234,6 +245,10 @@ let expenses_tests =
            assert_equal "0.50" (money_string "0.50") );
          ( "format money string" >:: fun _ ->
            assert_equal "1.50" (money_string "1.50") );
+         ( "format negative string" >:: fun _ ->
+           assert_equal "-1.50" (money_string "-1.50") );
+         ( "format zero string" >:: fun _ ->
+           assert_equal "-120.00" (money_string "-120.0") );
          ( "years as string" >:: fun _ ->
            assert_equal (possible_years [ expense0; expense1 ]) "2024" );
          ( "years as string" >:: fun _ ->
@@ -399,6 +414,12 @@ let expenses_tests =
              (expenses_by_date_range
                 [ expense0; expense1; expense2 ]
                 "01/01/2023" "01/01/2023") );
+         ( "expenses by multiple-date range with no matching entries"
+         >:: fun _ ->
+           assert_equal []
+             (expenses_by_date_range
+                [ expense0; expense1; expense2 ]
+                "01/01/1999" "01/01/2010") );
          ( "expenses above zero amount with empty list" >:: fun _ ->
            assert_equal [] (expenses_above [] 0.0) );
          ( "expenses below zero amount with empty list" >:: fun _ ->
@@ -462,6 +483,13 @@ let expenses_tests =
              (total_expenses
                 [
                   { expense0 with amount = -10. };
+                  { expense1 with amount = -10. };
+                ]) );
+         ( "total expenses with offsetting amount expenses" >:: fun _ ->
+           assert_equal 0.0
+             (total_expenses
+                [
+                  { expense0 with amount = 10. };
                   { expense1 with amount = -10. };
                 ]) );
          ( "get expenses by category with case-sensitive category" >:: fun _ ->
@@ -556,6 +584,16 @@ let expenses_tests =
          ( "get expenses by category with no matching entries" >:: fun _ ->
            assert_equal []
              (get_expenses [ expense1; expense2; expense3 ] "Travel") );
+         ( "get expenses by category with one matching entries" >:: fun _ ->
+           assert_equal [ expense0 ]
+             (get_expenses [ expense0; expense2; expense3 ] "Clothing") );
+         ( "get expenses by category with  duplicate entries" >:: fun _ ->
+           assert_equal [ expense2; expense2 ]
+             (get_expenses [ expense2; expense2; expense3 ] "Entertainment") );
+         ( "get expenses by category with multiple non-duplicate entries"
+         >:: fun _ ->
+           assert_equal [ expense2; expense6 ]
+             (get_expenses [ expense2; expense6 ] "Entertainment") );
          ( "get categories from empty expense list" >:: fun _ ->
            assert_equal [] (get_categories []) );
          ( "amount by category from empty expense list" >:: fun _ ->
@@ -569,10 +607,37 @@ let expenses_tests =
          );
          ( "expenses above zero amount with empty expense list" >:: fun _ ->
            assert_equal [] (expenses_above [] 10.0) );
+         ( "expenses above negative amount with nonempty expense list"
+         >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_above [ expense0 ] (-10.0)) );
+         ( "expenses above float amount with non empty expense list" >:: fun _ ->
+           assert_equal [ expense0 ] (expenses_above [ expense0 ] 0.0) );
+         ( "expenses multiple above float amount with non empty expense list"
+         >:: fun _ ->
+           assert_equal [ expense0; expense2 ]
+             (expenses_above [ expense0; expense2 ] 0.0) );
+         ( "expenses multiple above float amount with non empty expense list \
+            non above"
+         >:: fun _ ->
+           assert_equal [] (expenses_above [ expense0; expense2 ] 2000000.0) );
+         ( "expenses multiple above float amount with non empty expense list \
+            non above"
+         >:: fun _ ->
+           assert_equal [ expense2 ]
+             (expenses_above [ expense0; expense2 ] 21.0) );
          ( "expenses below max float amount with empty expense list" >:: fun _ ->
            assert_equal [] (expenses_below [] 1000.0) );
          ( "expenses between amount values with empty expense list" >:: fun _ ->
            assert_equal [] (expenses_between_ammounts [] 0.0 1000.0) );
+         ( "expenses between amount values with non empty expense list"
+         >:: fun _ ->
+           assert_equal [ expense0 ]
+             (expenses_between_ammounts [ expense0 ] 19.0 21.0) );
+         ( "expenses between amount values with non empty expense list"
+         >:: fun _ ->
+           assert_equal [ expense2 ]
+             (expenses_between_ammounts [ expense0; expense2 ] 21.0
+                22000000000.0) );
          ( "get expense by year with no entries" >:: fun _ ->
            assert_equal [] (get_expense_by_year [] "2024") );
          ( "get years from expenses with no entries" >:: fun _ ->
@@ -884,6 +949,17 @@ let pie_tests =
              (get_pie_data
                 (amount_by_category [ expense1; expense0 ]
                    (get_categories [ expense1; expense0 ]))) );
+         ( "floats to percentages" >:: fun _ ->
+           assert_equal [ 100. ]
+             (get_pie_data
+                (amount_by_category [ expense1 ] (get_categories [ expense1 ])))
+         );
+         ( "floats to percentages" >:: fun _ ->
+           assert_equal [ 100. ]
+             (get_pie_data
+                (amount_by_category
+                   [ expense0; expense0; expense0 ]
+                   (get_categories [ expense0; expense0; expense0 ]))) );
          ( "floats to percentages" >:: fun _ ->
            assert_equal
              [ 20.0; 20.0; 20.0; 20.0; 20.0 ]
