@@ -6,11 +6,11 @@ open Expense_tracker.Textbox
 open Graphics
 
 type budget_profile = {
-  bank : string;
-  goal : string;
-  age : string;
+  bank : float;
+  goal : float;
+  age : int;
   risk : string;
-  income : string;
+  income : float;
 }
 
 let current = ref 0
@@ -18,6 +18,7 @@ let width = ref 600
 let height = ref 450
 let expense_list = ref []
 let exit = ref 0
+let redo_budget = ref 0
 
 let help_screen_instruction =
   "<DO NOT USE THE 'x' (top left of the interface window) BUTTON TO CLOSE A \
@@ -281,50 +282,68 @@ let display_pie_chart list =
     pie_chart_correct_year list year
   else pie_chart_incorrect_year ()
 
+let float_input prompt =
+  try
+    let num = open_textbox_with_prompt prompt in
+    float_of_string num
+  with _ ->
+    redo_budget := 1;
+    0.0
+
+let int_input prompt =
+  try
+    let num = open_textbox_with_prompt prompt in
+    int_of_string num
+  with _ ->
+    redo_budget := 1;
+    1
+
 let display_budget_prompts () =
   open_graph "";
-  let bank =
-    open_textbox_with_prompt
-      "Enter the amount of money currently in your savings account: "
-  in
-  let goal =
-    open_textbox_with_prompt
-      "Enter the value in your bank account you wish to retire with: "
-  in
-  let age = open_textbox_with_prompt "Enter your age:  " in
+  let bank = float_input "Amount of money currently in your savings account:" in
+  let goal = float_input "Amount of money you wish to have by retirement:" in
+  let age = int_input "Enter your age:  " in
   let risk =
     open_textbox_with_prompt
-      "Select the risk level at which you prefer to manage your money \
-       (Risky/Normal/Safe) "
+      "Select risk level for budget management (Risky/Normal/Safe)"
   in
-  let income =
-    open_textbox_with_prompt "What is your average yearly income? "
-  in
+  let income = float_input "Your average annual income" in
   { bank; goal; age; risk; income }
 
 let display_budget_result bank risk age goal income list =
   open_graph "";
   moveto 0 (size_y () / 2);
-  draw_string (required_savings_per_year age risk list income goal bank);
-  synchronize ()
+  draw_string (required_savings_per_year age risk list income goal bank)
+
+let display_invalid_input () =
+  open_graph "";
+  let text = "One (or more) of your inputs are invalid (wait 3 seconds)" in
+  move_to_x_and_y !width !height text;
+  draw_string text;
+  Unix.sleepf 3.0;
+  exit := 2;
+  clear_graph ()
 
 let display_budget_analysis profile list =
-  let bank = float_of_string profile.bank in
+  let bank = profile.bank in
   let risk =
     match String.lowercase_ascii profile.risk with
     | "risky" -> Risky
     | "normal" -> Average
     | _ -> Safe
   in
-  let age = int_of_string profile.age in
-  let goal = float_of_string profile.goal in
-  let income = float_of_string profile.income in
-  display_budget_result bank risk age goal income list
+  let age = profile.age in
+  let goal = profile.goal in
+  let income = profile.income in
+  if !redo_budget = 0 then display_budget_result bank risk age goal income list
+  else display_invalid_input ()
 
 let display_budget list =
+  open_graph "";
   let prompt_answers = display_budget_prompts () in
   display_budget_analysis prompt_answers list;
-  if handle_exit_screen () then (
+  if !redo_budget <> 0 then redo_budget := 0
+  else if handle_exit_screen () then (
     exit := 2;
     clear_graph ())
 
