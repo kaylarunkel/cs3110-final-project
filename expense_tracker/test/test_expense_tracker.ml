@@ -876,6 +876,33 @@ let expenses_tests =
              [ ("Education", 100.) ]
              (percentage_of_total_expenses_by_category [ expense5; expense2 ])
          );
+         ( "testing management of when all expenses are 0 except one"
+         >:: fun _ ->
+           let expenses =
+             [
+               {
+                 description = "Groceries";
+                 category = "Food";
+                 amount = 50.0;
+                 date = "05/15/2024";
+               };
+               {
+                 description = "Clothes";
+                 category = "Fashion";
+                 amount = 0.;
+                 date = "05/15/2024";
+               };
+               {
+                 description = "Movie Tickets";
+                 category = "Entertainment";
+                 amount = 0.0;
+                 date = "05/15/2024";
+               };
+             ]
+           in
+           assert_equal
+             [ ("Entertainment", 0.); ("Fashion", 0.); ("Food", 100.) ]
+             (percentage_of_total_expenses_by_category expenses) );
        ]
 
 let s = "You're too old partner! There's no point in tracking your budget now."
