@@ -627,6 +627,8 @@ let expenses_tests =
          );
        ]
 
+let s = "You're too old partner! There's no point in tracking your budget now."
+
 let budgeting_tests =
   "test suite for budgeting functions"
   >::: [
@@ -666,31 +668,47 @@ let budgeting_tests =
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
-           assert_equal "You're too old partner!"
+           assert_equal s
              (required_savings_per_year 65 Safe [] 1000.0 1000.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
-           assert_equal "You're too old partner!"
+           assert_equal
+             "You're too old partner! There's no point in tracking your budget \
+              now."
              (required_savings_per_year 70 Risky [] 4000.0 4000.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
-           assert_equal "You are spending too much"
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
              (required_savings_per_year 40 Safe expense_list1 5.0 1000.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
-           assert_equal "You are spending too much"
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
              (required_savings_per_year 40 Safe expense_list1 16.0 800.0 0.0) );
        ]
 
-let pie_tests =
-  "test_suite"
-  >::: [
+(**let pie_tests = "test_suite" >:::
+   [
          "get_pie_data_test" >:: get_pie_data_test;
          "get_pie_data_empty_test" >:: get_pie_data_empty_test;
          "get_pie_data_single_test" >:: get_pie_data_single_test;
+       ]**)
+let pie_tests =
+  "test suite for pies"
+  >::: [
+         ( "floats to percentages" >:: fun _ ->
+           assert_equal [ 50.0; 50.0 ]
+             (get_pie_data
+                (amount_by_category [ expense1; expense0 ]
+                   (get_categories [ expense1; expense0 ]))) );
        ]
 
 let textbox_tests =
