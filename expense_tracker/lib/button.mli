@@ -37,11 +37,6 @@ val find_clicked_button_with_circle :
 (** [find_clicked_button_with_circle x y initial_x initial_y button_width button_height button_spacing categories]
     is the name of the category of the button pressed *)
 
-(*val find_clicked_button_rows : int -> int -> int -> int -> int -> int -> int
-  -> int -> string list -> string option (** [find_clicked_button x y initial_x
-  initial_y button_width button_height button_spacing categories] is the name of
-  the category of the button pressed *)*)
-
 val button_size : string list -> int -> int
 (** [button_size categories button_spacing] is the size that each button should
     be based on the length of [categories] and the [button_spacing] *)
