@@ -9,18 +9,8 @@ let current = ref 0
 let window_width = ref 600
 let window_height = ref 450
 
-let available_categories =
-  [
-    "Clothing";
-    "Food";
-    "Bills";
-    "Fitness";
-    "Travel";
-    "Entertainment";
-    "Housing";
-    "Education";
-    "Miscellaneous";
-  ]
+(*let available_categories = [ "Clothing"; "Food"; "Bills"; "Fitness"; "Travel";
+  "Entertainment"; "Housing"; "Education"; "Miscellaneous"; ]*)
 
 let home_help_screen_text =
   "Load CSV: Start with an already populated CSV of expenses.\n\
@@ -158,6 +148,12 @@ let rec help_screen_loop str =
     if handle_total_event () then true else help_screen_loop str
   with Graphic_failure _ -> false
 
+let display_help_screen str =
+  try
+    open_graph "";
+    if help_screen_loop str then close_graph ()
+  with Graphic_failure _ -> close_graph ()
+
 let move_to_x_and_y x y text =
   let text_width, text_height = text_size text in
   let x_position = (x - text_width) / 2 in
@@ -168,13 +164,6 @@ let display_total_instructions () =
   let instruction = "<Press any key to exit>" in
   move_to_x_and_y (size_x ()) (size_y () / 5) instruction;
   draw_string instruction
-
-let display_help_screen str =
-  try
-    open_graph "";
-    display_total_instructions ();
-    if help_screen_loop str then close_graph ()
-  with Graphic_failure _ -> close_graph ()
 
 let display_total_expenses_text total_expenses_text =
   clear_graph ();
@@ -206,9 +195,8 @@ let display_total_expenses_screen list =
 
 let add_expense list =
   let description = open_textbox_with_prompt "Enter description:" in
-  let items = available_categories in
   open_graph "";
-  let category = dropdown_menu (size_y ()) items in
+  let category = open_textbox_with_prompt "Enter category:" in
   let amount_str = open_textbox_with_prompt "Enter amount (must be a #):" in
   let amount = float_of_string amount_str in
   let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
@@ -242,12 +230,9 @@ let rec main list =
   let button_spacing = 20 in
   let max_button_height = 50 in
   let button_height = min max_button_height (size_y ()) in
-  let initial_x = button_spacing in
-  let initial_y = (size_y () - button_height) / 2 in
 
   let button_width = button_size categories button_spacing in
-  draw_buttons_with_positions categories initial_x initial_y button_width
-    button_height button_spacing;
+  draw_buttons !window_width !window_height categories;
   draw_help_button
     (size_x () - button_spacing)
     (size_y () - button_spacing)
@@ -258,11 +243,10 @@ let rec main list =
     let click_x = event.mouse_x in
     let click_y = event.mouse_y in
     let clicked_button =
-      find_clicked_button_with_circle click_x click_y initial_x initial_y
-        button_width button_height button_spacing categories
-        (size_x () - button_spacing)
-        (size_y () - button_spacing)
-        (button_spacing / 2)
+      find_clicked_button_with_circle click_x click_y button_width button_height
+        (!window_width - (!window_width / 10))
+        (!window_height - (!window_width / 10))
+        (!window_width / 20) categories
     in
 
     match clicked_button with
@@ -290,15 +274,13 @@ let rec main list =
         close_graph ();
         open_graph "";
         auto_synchronize true;
-        draw_analyze_buttons ();
+        draw_analyze_buttons !window_width !window_height;
         analyze_click list
     | "Add Exp." ->
         let updated_list = add_expense list in
         main updated_list
     | "Exit" -> close_graph ()
-    | "Circular Button" ->
-        display_help_screen "Main";
-        main list
+    | "Circular Button" -> display_help_screen "Main"
     | _ -> check_click ()
   and analyze_click list =
     let rec handle_analyze_click () =
@@ -307,11 +289,11 @@ let rec main list =
       let click_y = event.mouse_y in
       let button_width = button_size analyze_categories button_spacing in
       let a_clicked_button =
-        find_clicked_button_with_circle click_x click_y initial_x initial_y
-          button_width button_height button_spacing analyze_categories
-          (size_x () - button_spacing)
-          (size_y () - button_spacing)
-          (button_spacing / 2)
+        find_clicked_button_with_circle click_x click_y button_width
+          button_height
+          (!window_width - (!window_width / 10))
+          (!window_height - (!window_width / 10))
+          (!window_width / 20) categories
       in
       match a_clicked_button with
       | Some analyze_categories -> handle_a_category analyze_categories list
@@ -403,41 +385,29 @@ let rec main list =
   in
   check_click ()
 
-let rec draw_welcome_screen () =
-  open_graph "";
-  set_color black;
-  moveto 252 400;
-  draw_string "Expense Analyzer";
+let check_click () = if button_down () then mouse_pos () else (-1, -1)
 
-  let button_texts = [ "Load CSV"; "New CSV" ] in
-
-  let button_spacing = 20 in
-  let total_spacing = (List.length button_texts - 1) * button_spacing in
-  let available_width = size_x () - total_spacing - 20 in
-  let button_width = available_width / List.length button_texts in
-
-  let initial_x =
-    (size_x () - (button_width * List.length button_texts) - total_spacing) / 2
-  in
-
-  draw_buttons_with_positions button_texts initial_x 180 button_width 30
-    button_spacing;
+let welcome_screen_default categories =
+  draw_buttons !window_width !window_height categories;
+  move_to_x_and_y !window_width !window_height "Expense Analyser";
+  draw_string "Expense Analyser";
   draw_help_button
-    (size_x () - button_spacing)
-    (size_y () - button_spacing)
-    (button_spacing / 2);
-  synchronize ();
+    (9 * !window_width / 10)
+    (!window_height - (!window_width / 10))
+    (!window_width / 20)
 
-  let rec check_click () =
-    let event = wait_next_event [ Button_down ] in
-    let click_x = event.mouse_x in
-    let click_y = event.mouse_y in
+let rec welcome_screen_check_resize () =
+  resize_window_after_change (size_x ()) (size_y ());
+  let categories = [ "Load CSV"; "New CSV" ] in
+  welcome_screen_default categories;
+  let click_x, click_y = check_click () in
+  if check_click () <> (-1, -1) then
     match
-      find_clicked_button_with_circle click_x click_y initial_x 180 button_width
-        30 button_spacing button_texts
-        (size_x () - button_spacing)
-        (size_y () - button_spacing)
-        (button_spacing / 2)
+      find_clicked_button_with_circle click_x click_y !window_width
+        !window_height
+        (9 * !window_width / 10)
+        (!window_height - (!window_width / 10))
+        (!window_width / 20) categories
     with
     | Some "Load CSV" ->
         let filename = open_textbox_with_prompt "Enter CSV filename:" in
@@ -447,11 +417,47 @@ let rec draw_welcome_screen () =
     | Some "New CSV" ->
         let updated_list = add_expense [] in
         main updated_list
-    | Some "Circular Button" ->
-        display_help_screen "Home";
-        draw_welcome_screen ()
-    | _ -> check_click ()
-  in
-  check_click ()
+    | Some "Circular Button" -> display_help_screen "Home"
+    | _ -> welcome_screen_check_resize ()
+  else ()
 
-let () = draw_welcome_screen ()
+let rec welcome_screen_loop () =
+  try
+    welcome_screen_check_resize ();
+    welcome_screen_loop ()
+  with Graphic_failure _ -> false
+
+let display_welcome_screen () =
+  try
+    open_graph "";
+    if welcome_screen_loop () then close_graph ()
+  with Graphic_failure _ -> close_graph ()
+
+(*let draw_welcome_screen () = open_graph ""; set_color black; moveto 252 400;
+  draw_string "Expense Analyzer";
+
+  let button_texts = [ "Load CSV"; "New CSV" ] in
+
+  let button_spacing = 20 in let total_spacing = (List.length button_texts - 1)
+  * button_spacing in let available_width = size_x () - total_spacing - 20 in
+  let button_width = available_width / List.length button_texts in
+
+  let initial_x = (size_x () - (button_width * List.length button_texts) -
+  total_spacing) / 2 in
+
+  draw_buttons !window_width !window_height button_texts; draw_help_button
+  (size_x () - button_spacing) (size_y () - button_spacing) (button_spacing /
+  2); synchronize ();
+
+  let rec check_click () = let event = wait_next_event [ Button_down ] in let
+  click_x = event.mouse_x in let click_y = event.mouse_y in match
+  find_clicked_button_with_circle click_x click_y initial_x 180 button_width 30
+  button_spacing button_texts (size_x () - button_spacing) (size_y () -
+  button_spacing) (button_spacing / 2) with | Some "Load CSV" -> let filename =
+  open_textbox_with_prompt "Enter CSV filename:" in let new_list =
+  read_expenses_from_csv filename in Printf.printf "Expenses read from CSV\n
+  file.\n"; main new_list | Some "New CSV" -> let updated_list = add_expense []
+  in main updated_list | Some "Circular Button" -> display_help_screen "Home" |
+  _ -> check_click () in check_click ()*)
+
+let () = display_welcome_screen ()
