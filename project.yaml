@@ -13,7 +13,7 @@ group:
 pm:
   name: Allen Wu
   netid: axw4
-publish: false
+publish: true
 title: "OCaml Expense Tracker
 git-repo: "https://github.coecis.cornell.edu/ipr6/cs3110-final-project"
 demo-video-url: ""
