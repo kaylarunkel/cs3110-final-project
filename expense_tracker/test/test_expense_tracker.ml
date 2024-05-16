@@ -1,7 +1,6 @@
 open OUnit
 open Expense_tracker.Expenses
 open Expense_tracker.Pie
-open Expense_tracker.Textbox
 
 let expense0 =
   {
@@ -94,6 +93,7 @@ let expense10 =
   }
 
 let expense_list2 = [ expense6; expense7; expense8; expense9; expense10 ]
+let budget_list = [ expense0 ]
 
 let expense11 =
   {
@@ -133,6 +133,14 @@ let expense15 =
     category = "Transportation";
     amount = 20.0;
     date = "04/17/2024";
+  }
+
+let expense16 =
+  {
+    description = "Gym Membership";
+    category = "Fitness";
+    amount = 20.0;
+    date = "04/17/2022";
   }
 
 let expenses_tests =
@@ -216,12 +224,22 @@ let expenses_tests =
            assert_equal "12.00" (money_string "12.") );
          ( "format money string" >:: fun _ ->
            assert_equal "14.50" (money_string "14.5") );
+         ( "format money string already done" >:: fun _ ->
+           assert_equal "14.75" (money_string "14.75") );
          ( "format money string" >:: fun _ ->
            assert_equal "120.00" (money_string "120.0") );
          ( "format money string" >:: fun _ ->
            assert_equal "0.00" (money_string "0.") );
          ( "format money string" >:: fun _ ->
            assert_equal "0.50" (money_string "0.50") );
+         ( "format money string" >:: fun _ ->
+           assert_equal "1.50" (money_string "1.50") );
+         ( "years as string" >:: fun _ ->
+           assert_equal (possible_years [ expense0; expense1 ]) "2024" );
+         ( "years as string" >:: fun _ ->
+           assert_equal
+             (possible_years [ expense0; expense1; expense2 ])
+             "2023, 2024" );
          ("get years from expenses" >:: fun _ -> assert_equal [] []);
          ( "get years from expenses" >:: fun _ ->
            assert_equal (possible_years_list [ expense0 ]) [ 2024 ] );
@@ -229,8 +247,18 @@ let expenses_tests =
            assert_equal (possible_years_list [ expense0; expense1 ]) [ 2024 ] );
          ( "get years from expenses" >:: fun _ ->
            assert_equal
+             (possible_years_list [ expense0; expense1; expense2 ])
+             [ 2024; 2023 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal (possible_years []) "" );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal
              (possible_years_list [ expense0; expense2 ])
              [ 2024; 2023 ] );
+         ( "get years from expenses" >:: fun _ ->
+           assert_equal
+             (possible_years_list [ expense15; expense16 ])
+             [ 2024; 2022 ] );
          ( "get expenses for specific year" >:: fun _ ->
            assert_equal [] (get_expense_by_year [ expense0 ] "2022") );
          ( "get expenses for specific year" >:: fun _ ->
@@ -322,6 +350,10 @@ let expenses_tests =
            assert_equal []
              (expenses_by_date_range [ expense0; expense1 ] "01/01/2025"
                 "01/01/2026") );
+         ( "expenses by very-old date range" >:: fun _ ->
+           assert_equal []
+             (expenses_by_date_range [ expense0; expense1 ] "01/01/0000"
+                "01/01/0001") );
          ( "add expense with special characters in description" >:: fun _ ->
            let expense_special =
              {
@@ -333,6 +365,17 @@ let expenses_tests =
            in
            assert_equal [ expense_special ]
              (add_expense [] "Special @#&*" "Misc" 15.0 "05/01/2024") );
+         ( "add expense with special characters in description" >:: fun _ ->
+           let expense_special =
+             {
+               description = "Defn 1";
+               category = "Prac";
+               amount = 150.75;
+               date = "05/01/2000";
+             }
+           in
+           assert_equal [ expense_special ]
+             (add_expense [] "Defn 1" "Prac" 150.75 "05/01/2000") );
          ( "total expense with multiple expenses of different categories"
          >:: fun _ ->
            assert_equal
@@ -714,34 +757,19 @@ let s = "You're too old partner! There's no point in tracking your budget now."
 let budgeting_tests =
   "test suite for budgeting functions"
   >::: [
-         ( "test calculate_budget_with_bank_balance with income, bank_balance, \
-            and risky"
-         >:: fun _ ->
-           assert_equal 0. (calculate_budget_with_bank_balance 0.0 0.0 false) );
-         ( "test calculate_budget_with_bank_balance risky" >:: fun _ ->
-           assert_equal 550.
-             (calculate_budget_with_bank_balance 500.0 100.0 true) );
-         ( "test calculate_budget_with_bank_balance non-risky" >:: fun _ ->
-           assert_equal 1000.
-             (calculate_budget_with_bank_balance 1000.0 200.0 false) );
-         ( "test calculate_budget_with_zero_income_and_bank_balance with \
-            bank_balance and risky"
-         >:: fun _ ->
-           assert_equal 0.
-             (calculate_budget_with_zero_income_and_bank_balance 0.0 false) );
-         ( "test calculate_budget_with_zero_income_and_bank_balance non-risky"
-         >:: fun _ ->
-           assert_equal 90.
-             (calculate_budget_with_zero_income_and_bank_balance 100.0 true) );
-         ( "test calculate_budget_with_zero_income_and_bank_balance risky"
-         >:: fun _ ->
-           assert_equal 80.
-             (calculate_budget_with_zero_income_and_bank_balance 100.0 false) );
          ( "test present_value_retirement_func with future_value, \
             discount_rate, and years 1"
          >:: fun _ ->
            assert_equal 620.921323059154929
              (present_value_retirement_func 1000.0 0.1 5) );
+         ( "test present_value_retirement_func with future_value, \
+            discount_rate, and years no years"
+         >:: fun _ ->
+           assert_equal 1000.0 (present_value_retirement_func 1000.0 0.1 0) );
+         ( "test present_value_retirement_func with future_value, \
+            discount_rate, and years no money"
+         >:: fun _ -> assert_equal 0. (present_value_retirement_func 0. 0. 10)
+         );
          ( "test present_value_retirement_func with future_value, \
             discount_rate, and years 2"
          >:: fun _ ->
@@ -764,32 +792,32 @@ let budgeting_tests =
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 40 Safe expense_list1 5.0 1000.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 40 Safe expense_list1 16.0 800.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 32 Risky expense_list2 9.0 900.0 0.0) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 32 Average expense_list2 13.0 100.0 0.0)
          );
          ( "test required_savings_per_year with age, risk_profile, budget, \
@@ -797,8 +825,8 @@ let budgeting_tests =
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 32 Risky expense_list2 18.0 900.0 0.0)
          );
          ( "test required_savings_per_year with age, risk_profile, budget, \
@@ -806,18 +834,48 @@ let budgeting_tests =
          >:: fun _ ->
            assert_equal
              "You are spending too much relative to your income. We suggest \
-              you review your expense breakdown through the pie charts and cut \
-              back on unnecessary expenses."
+              youreview your expense breakdown. \n\
+             \ Check your piechart for more information."
              (required_savings_per_year 32 Average expense_list2 10.0 900.0 0.0)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 2 full input"
+         >:: fun _ ->
+           assert_equal "You have to cut your budget by 50317.%"
+             (required_savings_per_year 40 Average budget_list 1000. 1000000. 0.)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 3 full input"
+         >:: fun _ ->
+           assert_equal "You can raise your expenditure by 34316.%"
+             (required_savings_per_year 50 Average budget_list 10000. 100000.
+                1000.) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 3 full input"
+         >:: fun _ ->
+           assert_equal "You can raise your expenditure by 38105.%"
+             (required_savings_per_year 50 Risky budget_list 10000. 100000.
+                1000.) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 6 full input"
+         >:: fun _ ->
+           assert_equal "You can raise your expenditure by 32093.%"
+             (required_savings_per_year 50 Safe budget_list 10000. 100000. 1000.)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 4 full input"
+         >:: fun _ ->
+           assert_equal "You have to cut your budget by 28664.%"
+             (required_savings_per_year 40 Risky budget_list 1000. 1000000. 0.)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 5 full input"
+         >:: fun _ ->
+           assert_equal "You have to cut your budget by 64494.%"
+             (required_savings_per_year 40 Safe budget_list 1000. 1000000. 0.)
          );
        ]
 
-(**let pie_tests = "test_suite" >:::
-   [
-         "get_pie_data_test" >:: get_pie_data_test;
-         "get_pie_data_empty_test" >:: get_pie_data_empty_test;
-         "get_pie_data_single_test" >:: get_pie_data_single_test;
-       ]**)
 let pie_tests =
   "test suite for pies"
   >::: [
@@ -835,17 +893,12 @@ let pie_tests =
                    (get_categories
                       [ expense11; expense12; expense13; expense14; expense15 ])))
          );
-       ]
-
-let textbox_tests =
-  "test suite for textbox"
-  >::: [
-         ( "create textbox" >:: fun _ ->
-           assert_equal { content = ""; cursor_pos = 0 } (create_textbox ()) );
+         ( "floats to percentages_none" >:: fun _ ->
+           assert_equal []
+             (get_pie_data (amount_by_category [] (get_categories []))) );
        ]
 
 let suite =
-  "overall test suite"
-  >::: [ expenses_tests; budgeting_tests; pie_tests; textbox_tests ]
+  "overall test suite" >::: [ expenses_tests; budgeting_tests; pie_tests ]
 
 let _ = run_test_tt_main suite

@@ -79,14 +79,6 @@ val money_string : string -> string
 (** [money_string amount] converts a float amount to a string with proper
     formatting *)
 
-val calculate_budget_with_bank_balance : float -> float -> bool -> float
-(** [calculate_budget_with_bank_balance income bank_balance risky] calculates
-    budget based on income and bank balance *)
-
-val calculate_budget_with_zero_income_and_bank_balance : float -> bool -> float
-(** [calculate_budget_with_zero_income_and_bank_balance bank_balance risky]
-    calculates budget based on bank balance only *)
-
 val percentage_of_total_expenses_by_category :
   expense_list -> (string * float) list
 (** [percentage_of_total_expenses_by_category expenses] calculates the

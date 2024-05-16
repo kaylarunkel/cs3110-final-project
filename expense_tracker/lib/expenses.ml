@@ -186,19 +186,6 @@ let money_string amount =
   else if num + 2 = len then amount ^ "0"
   else amount
 
-let calculate_budget_with_bank_balance income bank_balance risky =
-  let savings_amount = if risky then 0.1 *. income else 0.2 *. income in
-  let remaining_income = income -. savings_amount in
-  let available_funds = bank_balance +. remaining_income in
-  max 0.0 available_funds
-
-let calculate_budget_with_zero_income_and_bank_balance bank_balance risky =
-  let savings_amount =
-    if risky then 0.1 *. bank_balance else 0.2 *. bank_balance
-  in
-  let remaining_funds = bank_balance -. savings_amount in
-  max 0.0 remaining_funds
-
 let percentage_of_total_expenses_by_category (expenses : expense_list) :
     (string * float) list =
   let recent_year = List.hd (possible_years_list expenses) |> string_of_int in
@@ -269,9 +256,9 @@ let required_savings_per_year age risk_profile budget income retirement_goal
     let recent_year = List.hd (possible_years_list budget) |> string_of_int in
     let budget = get_expense_by_year budget recent_year in
     if income < total_expenses budget then
-      "You are spending too much relative to your income. We suggest you \
-       review your expense breakdown through the pie charts and cut back on \
-       unnecessary expenses."
+      "You are spending too much relative to your income. We suggest youreview \
+       your expense breakdown. \n\
+      \ Check your piechart for more information."
     else
       let money_per_year =
         money_needed age risk_profile retirement_goal bank_balance
@@ -288,7 +275,9 @@ let required_savings_per_year age risk_profile budget income retirement_goal
       if Float.round percent_change > 0. then
         "You have to cut your budget by "
         ^ string_of_float (Float.round percent_change)
+        ^ "%"
       else if Float.round percent_change < 0. then
         "You can raise your expenditure by "
-        ^ string_of_float (Float.round percent_change)
+        ^ string_of_float (-1. *. Float.round percent_change)
+        ^ "%"
       else "You don't have to change a thing! You are on the right track."

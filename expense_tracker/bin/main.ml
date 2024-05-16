@@ -312,14 +312,15 @@ let display_budget_prompts () =
 
 let display_budget_result bank risk age goal income list =
   open_graph "";
-  moveto 0 (size_y () / 2);
-  draw_string (required_savings_per_year age risk list income goal bank)
+  moveto 20 (size_y () / 2);
+  let x = required_savings_per_year age risk list income goal bank in
+  draw_string_newline x 20 (size_y () / 2)
 
 let display_invalid_input () =
   open_graph "";
   let text = "One (or more) of your inputs are invalid (wait 3 seconds)" in
   move_to_x_and_y !width !height text;
-  draw_string text;
+  draw_string_newline text 20 (size_y () / 2);
   Unix.sleepf 3.0;
   exit := 2;
   clear_graph ()
