@@ -5,18 +5,23 @@ open Expense_tracker.Button
 open Expense_tracker.Textbox
 open Graphics
 
+type budget_profile = {
+  bank : string;
+  goal : string;
+  age : string;
+  risk : string;
+  income : string;
+}
+
 let current = ref 0
 let width = ref 600
 let height = ref 450
 let expense_list = ref []
 let exit = ref 0
 
-(*let available_categories = [ "Clothing"; "Food"; "Bills"; "Fitness"; "Travel";
-  "Entertainment"; "Housing"; "Education"; "Miscellaneous"; ]*)
-
 let help_screen_instruction =
-  "<DO NOT USE THE 'x' (top left of the interface window) BUTTON TO CLOSE THIS \
-   HELP SCREEN>\n\
+  "<DO NOT USE THE 'x' (top left of the interface window) BUTTON TO CLOSE A \
+   SCREEN>\n\
    INSTEAD, PRESS ANY KEY ON YOUR KEYBOARD TO CLOSE IT.\n\n\
   \ "
 
@@ -54,23 +59,20 @@ let categories =
   ]
 
 let analyze_categories = [ "Pie Chart"; "Bar Graph"; "Budget" ]
+let move_to_newline y_position = y_position - 20
 
-let move_to_newline () =
-  let text_size = 20 in
-  let y_increment = text_size + 2 in
-  moveto 20 (current_y () - y_increment)
-
-let rec draw_string_newline str x y =
-  try
-    let newline_index = String.index str '\n' in
-    let first_part = String.sub str 0 newline_index in
-    draw_string first_part;
-    move_to_newline ();
-    let remaining_str =
-      String.sub str (newline_index + 1) (String.length str - newline_index - 1)
-    in
-    draw_string_newline remaining_str x y
-  with Not_found -> draw_string str
+let draw_string_newline str x y =
+  let lines = String.split_on_char '\n' str in
+  let rec draw_lines lines x y =
+    match lines with
+    | [] -> ()
+    | line :: rest ->
+        moveto x y;
+        draw_string line;
+        let new_y_position = move_to_newline y in
+        draw_lines rest x new_y_position
+  in
+  draw_lines lines x y
 
 let resize_window_after_change new_width new_height =
   if new_width <> !width || new_height <> !height then (
@@ -153,13 +155,13 @@ let handle_exit_screen () =
 
 let help_screen_check_resize str =
   resize_window_after_change (size_x ()) (size_y ());
-  moveto (!width / 100) (14 * !height / 15);
   let text =
     match str with
     | "Home" -> home_help_screen_text
     | "Main" -> main_help_screen_text
     | _ -> "No help available :("
   in
+  clear_graph ();
   draw_string_newline text (!width / 100) (14 * !height / 15)
 
 let rec help_screen_loop str =
@@ -248,36 +250,40 @@ let save_expenses_refactored () =
   let filename = open_textbox_with_prompt "Enter filename to save:" in
   save_expenses_to_csv filename !expense_list
 
+let pie_chart_first_prompt list =
+  open_textbox_with_prompt ("Year - choose from (" ^ possible_years list ^ ")")
+
+let pie_chart_correct_year list year =
+  let categories = get_categories list in
+  let year_expenses = get_expense_by_year list year in
+  let data = get_pie_data (amount_by_category year_expenses categories) in
+  draw_pie_chart_with_labels data (Array.of_list categories);
+  exit := 2
+
+let pie_chart_incorrect_year () =
+  open_graph "";
+  let msg = "No data exists for the year you inputted (wait 3 seconds)" in
+  let get_size_x (msg, _) = msg in
+  let get_size_y (_, msg) = msg in
+  moveto
+    ((size_x () - get_size_x (text_size msg)) / 2)
+    ((size_y () - get_size_y (text_size msg)) / 2);
+  draw_string msg;
+  Unix.sleep 3;
+  exit := 2;
+  clear_graph ()
+
 let display_pie_chart list =
   open_graph "";
-  let textbox_for_year_pie =
-    open_textbox_with_prompt ("Year - choose from (" ^ possible_years list ^ ")")
-  in
+  let year = pie_chart_first_prompt list in
   close_graph ();
-  if List.mem (int_of_string textbox_for_year_pie) (possible_years_list list)
-  then (
-    let categories = get_categories list in
-    let year_expenses = get_expense_by_year list textbox_for_year_pie in
-    let data = get_pie_data (amount_by_category year_expenses categories) in
-    draw_pie_chart_with_labels data (Array.of_list categories);
-    exit := 2)
-  else (
-    open_graph "";
-    auto_synchronize true;
-    let msg = "No data exists for the year you inputted (wait 3 seconds)" in
-    let get_size_x (msg, _) = msg in
-    let get_size_y (_, msg) = msg in
-    moveto
-      ((size_x () - get_size_x (text_size msg)) / 2)
-      ((size_y () - get_size_y (text_size msg)) / 2);
-    draw_string msg;
-    Unix.sleep 3;
-    exit := 2;
-    clear_graph ())
+  if List.mem (int_of_string year) (possible_years_list list) then
+    pie_chart_correct_year list year
+  else pie_chart_incorrect_year ()
 
-let display_budget list =
+let display_budget_prompts () =
   open_graph "";
-  let bank_balance_str =
+  let bank =
     open_textbox_with_prompt
       "Enter the amount of money currently in your savings account: "
   in
@@ -285,33 +291,39 @@ let display_budget list =
     open_textbox_with_prompt
       "Enter the value in your bank account you wish to retire with: "
   in
-  let age = open_textbox_with_prompt "Enter you age:  " in
-
-  let risk_preference_str =
+  let age = open_textbox_with_prompt "Enter your age:  " in
+  let risk =
     open_textbox_with_prompt
       "Select the risk level at which you prefer to manage your money \
        (Risky/Normal/Safe) "
   in
-  let income_str =
+  let income =
     open_textbox_with_prompt "What is your average yearly income? "
   in
+  { bank; goal; age; risk; income }
 
-  let bank_balance = float_of_string bank_balance_str in
-  let risk_profile =
-    match String.lowercase_ascii risk_preference_str with
-    | "Risky" -> Risky
-    | "Normal" -> Average
-    | _ -> Safe
-  in
-  let age = int_of_string age in
-  let retirement_goal = float_of_string goal in
-  let income = float_of_string income_str in
+let display_budget_result bank risk age goal income list =
   open_graph "";
   moveto 0 (size_y () / 2);
-  draw_string
-    (required_savings_per_year age risk_profile list income retirement_goal
-       bank_balance);
-  synchronize ();
+  draw_string (required_savings_per_year age risk list income goal bank);
+  synchronize ()
+
+let display_budget_analysis profile list =
+  let bank = float_of_string profile.bank in
+  let risk =
+    match String.lowercase_ascii profile.risk with
+    | "risky" -> Risky
+    | "normal" -> Average
+    | _ -> Safe
+  in
+  let age = int_of_string profile.age in
+  let goal = float_of_string profile.goal in
+  let income = float_of_string profile.income in
+  display_budget_result bank risk age goal income list
+
+let display_budget list =
+  let prompt_answers = display_budget_prompts () in
+  display_budget_analysis prompt_answers list;
   if handle_exit_screen () then (
     exit := 2;
     clear_graph ())

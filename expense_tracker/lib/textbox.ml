@@ -7,9 +7,10 @@ type textbox = {
 
 let create_textbox () = { content = ""; cursor_pos = 0 }
 
-let draw_textbox textbox x y width height =
-  moveto (size_x () - 200) (size_y () - 200);
-
+let draw_textbox textbox width height =
+  let x = (size_x () - width) / 2 in
+  let y = (size_y () - height) / 2 in
+  moveto x y;
   set_color black;
   fill_rect x y width height;
   set_color white;
@@ -37,77 +38,35 @@ let handle_key_press textbox key =
         (String.length textbox.content - textbox.cursor_pos);
   textbox.cursor_pos <- textbox.cursor_pos + 1
 
-let read_textbox_input () =
+let draw_input_box textbox prompt =
   open_graph "";
   auto_synchronize true;
-  let textbox = create_textbox () in
-  let draw_input_box () =
-    clear_graph ();
-    draw_textbox textbox 100 400 200 30;
-    synchronize ()
-  in
-  let rec handle_input () =
-    let event = wait_next_event [ Key_pressed ] in
-    if event.keypressed then begin
-      match event.key with
-      | '\r' ->
-          (* Enter key *)
-          close_graph ();
-          textbox.content
-      | '\b' | '' ->
-          (* Backspace or Delete *)
-          handle_backspace textbox;
-          draw_input_box ();
-          handle_input ()
-      | _ ->
-          handle_key_press textbox event.key;
-          draw_input_box ();
-          handle_input ()
-    end
-    else handle_input ()
-  in
-  draw_input_box ();
-  let input = handle_input () in
-  input
+  clear_graph ();
+  draw_textbox textbox (size_x () / 3) (size_y () / 8);
+  moveto (size_x () / 3) (3 * size_y () / 5);
+  draw_string prompt;
+  synchronize ()
+
+let rec handle_input textbox prompt =
+  let event = wait_next_event [ Key_pressed ] in
+  if event.keypressed then begin
+    match event.key with
+    | '\r' ->
+        close_graph ();
+        textbox.content
+    | '\b' | '' ->
+        handle_backspace textbox;
+        draw_input_box textbox prompt;
+        handle_input textbox prompt
+    | _ ->
+        handle_key_press textbox event.key;
+        draw_input_box textbox prompt;
+        handle_input textbox prompt
+  end
+  else handle_input textbox prompt
 
 let open_textbox_with_prompt prompt =
-  open_graph "";
-  auto_synchronize true;
-
   let textbox = create_textbox () in
-  let draw_input_box () =
-    clear_graph ();
-    draw_textbox textbox 100 400 200 30;
-    set_color black;
-    moveto 100 430;
-    draw_string prompt;
-    synchronize ()
-  in
-  let rec handle_input () =
-    let event = wait_next_event [ Key_pressed ] in
-    if event.keypressed then begin
-      match event.key with
-      | '\r' ->
-          close_graph ();
-          textbox.content
-      | '\b' | '' ->
-          if textbox.cursor_pos > 0 then begin
-            textbox.content <-
-              String.sub textbox.content 0 (textbox.cursor_pos - 1)
-              ^ String.sub textbox.content textbox.cursor_pos
-                  (String.length textbox.content - textbox.cursor_pos);
-            textbox.cursor_pos <- textbox.cursor_pos - 1;
-            draw_input_box ();
-            handle_input ()
-          end
-          else handle_input ()
-      | _ ->
-          handle_key_press textbox event.key;
-          draw_input_box ();
-          handle_input ()
-    end
-    else handle_input ()
-  in
-  draw_input_box ();
-  let input = handle_input () in
-  input
+  draw_input_box textbox prompt;
+  draw_input_box textbox prompt;
+  handle_input textbox prompt
