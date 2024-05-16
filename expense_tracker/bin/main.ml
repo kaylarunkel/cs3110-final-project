@@ -215,6 +215,22 @@ let add_expense list =
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
+let text_width text =
+  let width, _ = text_size text in
+  width
+
+let wrap_text text width =
+  let rec wrap_lines acc_line acc_lines = function
+    | [] -> acc_line :: acc_lines
+    | word :: words ->
+        let line = acc_line ^ " " ^ word in
+        let line_width = text_width line in
+        if line_width <= width then wrap_lines line acc_lines words
+        else wrap_lines word (acc_line :: acc_lines) words
+  in
+  String.concat "\n"
+    (List.rev (wrap_lines "" [] (String.split_on_char ' ' text)))
+
 let rec main list =
   let categories =
     [
@@ -390,9 +406,23 @@ let rec main list =
           let income = float_of_string income_str in
           open_graph "";
           moveto 0 (size_y () / 2);
-          draw_string
-            (required_savings_per_year age risk_profile list income
-               retirement_goal bank_balance);
+          let y = size_y () / 2 in
+          let x = size_x () in
+          let lines =
+            String.split_on_char '\n'
+              (wrap_text
+                 (required_savings_per_year age risk_profile list income
+                    retirement_goal bank_balance)
+                 x)
+          in
+          let rec draw_lines y = function
+            | [] -> ()
+            | line :: rest ->
+                moveto 0 (y - 20);
+                draw_string line;
+                draw_lines (y - 20) rest
+          in
+          draw_lines y lines;
           synchronize ();
           ignore (wait_next_event [ Button_down ]);
           close_graph ();
