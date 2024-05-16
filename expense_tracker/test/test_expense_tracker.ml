@@ -883,24 +883,18 @@ let s = "You're too old partner! There's no point in tracking your budget now."
 let budgeting_tests =
   "test suite for budgeting functions"
   >::: [
-         ( "test present_value_retirement_func with future_value, \
-            discount_rate, and years 1"
+         ( "test retirement_func with future_value, discount_rate, and years 1"
          >:: fun _ ->
-           assert_equal 620.921323059154929
-             (present_value_retirement_func 1000.0 0.1 5) );
-         ( "test present_value_retirement_func with future_value, \
-            discount_rate, and years no years"
+           assert_equal 620.921323059154929 (retirement_func 1000.0 0.1 5) );
+         ( "test retirement_func with future_value, discount_rate, and years \
+            no years"
+         >:: fun _ -> assert_equal 1000.0 (retirement_func 1000.0 0.1 0) );
+         ( "test retirement_func with future_value, discount_rate, and years \
+            no money"
+         >:: fun _ -> assert_equal 0. (retirement_func 0. 0. 10) );
+         ( "test retirement_func with future_value, discount_rate, and years 2"
          >:: fun _ ->
-           assert_equal 1000.0 (present_value_retirement_func 1000.0 0.1 0) );
-         ( "test present_value_retirement_func with future_value, \
-            discount_rate, and years no money"
-         >:: fun _ -> assert_equal 0. (present_value_retirement_func 0. 0. 10)
-         );
-         ( "test present_value_retirement_func with future_value, \
-            discount_rate, and years 2"
-         >:: fun _ ->
-           assert_equal 3069.5662677037958
-             (present_value_retirement_func 5000.0 0.05 10) );
+           assert_equal 3069.5662677037958 (retirement_func 5000.0 0.05 10) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 1"
          >:: fun _ ->

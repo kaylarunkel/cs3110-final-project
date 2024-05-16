@@ -203,37 +203,51 @@ let percentage_of_total_expenses_by_category expenses =
       (category, amount /. total_expenses_recent_year *. 100.0))
     expenses_by_category
 
-let present_value_retirement_func future_value discount_rate years =
+let retirement_func future_value discount_rate years =
   future_value /. ((1.0 +. discount_rate) ** float_of_int years)
 
-let money_needed age risk_profile retirement_goal bank_balance =
+let money_needed age risk goal bank =
   let growth_rate =
-    match risk_profile with
+    match risk with
     | Safe -> 0.04
     | Average -> 0.06
     | Risky -> 0.1
   in
-  let years_until_retirement = 65 - age in
-  let present_value_retirement =
-    present_value_retirement_func retirement_goal 0.05 years_until_retirement
-  in
+  let years_left = 65 - age in
+  let present_value_retirement = retirement_func goal 0.05 years_left in
   let future_value_savings =
-    bank_balance *. (1. +. (growth_rate ** float_of_int years_until_retirement))
+    bank *. (1. +. (growth_rate ** float_of_int years_left))
   in
   let present_value_savings =
-    future_value_savings /. (1.05 ** float_of_int years_until_retirement)
+    future_value_savings /. (1.05 ** float_of_int years_left)
   in
   let present_money_needed =
     present_value_retirement -. present_value_savings
   in
+  present_money_needed *. (0.05 -. growth_rate)
+  /. (1. -. (((1. +. growth_rate) /. 1.05) ** float_of_int years_left))
 
-  let money_needed =
-    present_money_needed *. (0.05 -. growth_rate)
-    /. (1.
-       -. (((1. +. growth_rate) /. 1.05) ** float_of_int years_until_retirement)
-       )
-  in
-  money_needed
+let young_age_savings age risk budget income goal bank =
+  let recent_year = List.hd (possible_years_list budget) |> string_of_int in
+  let budget = get_expense_by_year budget recent_year in
+  if income < total_expenses budget then
+    "You are spending too much relative to your income. We suggest youreview \
+     your expense breakdown. \n\
+    \ Check your piechart for more information."
+  else
+    let money_per_year = money_needed age risk goal bank in
+    let current_savings_per_year = income -. total_expenses budget in
+    let difference = money_per_year -. current_savings_per_year in
+    let percent_change = difference /. total_expenses budget *. 100. in
+    if Float.round percent_change > 0. then
+      "You have to cut your budget by "
+      ^ string_of_float (Float.round percent_change)
+      ^ "%"
+    else if Float.round percent_change < 0. then
+      "You can raise your expenditure by "
+      ^ string_of_float (-1. *. Float.round percent_change)
+      ^ "%"
+    else "You don't have to change a thing! You are on the right track."
 
 let required_savings_per_year age risk_profile budget income retirement_goal
     bank_balance =
@@ -247,20 +261,5 @@ let required_savings_per_year age risk_profile budget income retirement_goal
        your expense breakdown. \n\
       \ Check your piechart for more information."
     else
-      let money_per_year =
-        money_needed age risk_profile retirement_goal bank_balance
-      in
-      let current_savings_per_year = income -. total_expenses budget in
-
-      let difference = money_per_year -. current_savings_per_year in
-      let percent_change = difference /. total_expenses budget *. 100. in
-
-      if Float.round percent_change > 0. then
-        "You have to cut your budget by "
-        ^ string_of_float (Float.round percent_change)
-        ^ "%"
-      else if Float.round percent_change < 0. then
-        "You can raise your expenditure by "
-        ^ string_of_float (-1. *. Float.round percent_change)
-        ^ "%"
-      else "You don't have to change a thing! You are on the right track."
+      young_age_savings age risk_profile budget income retirement_goal
+        bank_balance

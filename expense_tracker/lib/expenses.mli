@@ -88,9 +88,9 @@ type risk_profile =
   | Average
   | Risky
 
-val present_value_retirement_func : float -> float -> int -> float
-(** [present_value_retirement_func future_value discount_rate years] calculates
-    present value for retirement *)
+val retirement_func : float -> float -> int -> float
+(** [retirement_func future_value discount_rate years] calculates present value
+    for retirement *)
 
 val money_needed : int -> risk_profile -> float -> float -> float
 (** [money_needed age risk_profile retirement_goal bank_balance] calculates
