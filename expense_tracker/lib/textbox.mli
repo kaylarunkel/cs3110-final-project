@@ -2,6 +2,7 @@ type textbox = {
   mutable content : string;
   mutable cursor_pos : int;
 }
+(** Represents a textbox in which the users will type their responses*)
 
 val open_textbox_with_prompt : string -> string
 (** [open_textbox_with_prompt prompt] opens a textbox with the given prompt.
