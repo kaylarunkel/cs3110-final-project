@@ -222,13 +222,42 @@ let display_total_expenses_screen list =
     if total_expenses_loop total_expenses_text then close_graph ()
   with Graphic_failure _ -> close_graph ()
 
+let rec get_valid_date () =
+  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
+  match String.split_on_char '/' date with
+  | [ month; day; year ] -> (
+      try
+        let _ = int_of_string month in
+        let _ = int_of_string day in
+        let _ = int_of_string year in
+        if
+          String.length month = 2
+          && String.length day = 2
+          && String.length year = 4
+        then date
+        else get_valid_date ()
+      with Failure _ -> get_valid_date ())
+  | _ -> get_valid_date ()
+
 let add_expense list =
   let description = open_textbox_with_prompt "Enter description:" in
   open_graph "";
   let category = open_textbox_with_prompt "Enter category:" in
-  let amount_str = open_textbox_with_prompt "Enter amount (must be a #):" in
-  let amount = try float_of_string amount_str with _ -> 0.0 in
-  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
+  let rec get_valid_amount () =
+    let amount_str =
+      open_textbox_with_prompt "Enter amount (must be a number):"
+    in
+    try
+      let amount = float_of_string amount_str in
+      if
+        classify_float amount = FP_normal
+        || classify_float amount = FP_subnormal
+      then amount
+      else get_valid_amount ()
+    with Failure _ -> get_valid_amount ()
+  in
+  let amount = get_valid_amount () in
+  let date = get_valid_date () in
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
