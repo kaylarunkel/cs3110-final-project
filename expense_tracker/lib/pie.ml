@@ -45,7 +45,7 @@ let draw_pie_chart_with_labels (values : float list) (labels : string array) :
         start_angle := !start_angle +. slice_angle)
       values;
     ignore (read_key ());
-    close_graph ()
+    clear_graph ()
   with Graphics.Graphic_failure _ -> close_graph ()
 
 let get_pie_data (amounts : (string * float) list) =

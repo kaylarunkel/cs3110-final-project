@@ -6,15 +6,17 @@ open Expense_tracker.Textbox
 open Graphics
 
 let current = ref 0
-let window_width = ref 600
-let window_height = ref 450
+let width = ref 600
+let height = ref 450
 let expense_list = ref []
+let exit = ref 0
 
 (*let available_categories = [ "Clothing"; "Food"; "Bills"; "Fitness"; "Travel";
   "Entertainment"; "Housing"; "Education"; "Miscellaneous"; ]*)
 
 let help_screen_instruction =
-  "<DO NOT USE THE 'x' BUTTON TO CLOSE THIS HELP SCREEN>\n\
+  "<DO NOT USE THE 'x' (top left of the interface window) BUTTON TO CLOSE THIS \
+   HELP SCREEN>\n\
    INSTEAD, PRESS ANY KEY ON YOUR KEYBOARD TO CLOSE IT.\n\n\
   \ "
 
@@ -32,16 +34,13 @@ let main_help_screen_text =
      Read CSV: Read expenses from a CSV.\n\
      Save Exp: Save all expenses to CSV.\n\
      Analyze: Analyze your expenses in a pie chart, bar graph, or budget \
-     analyzer!\n\
-     Add Exp.: Add an expense to your list.\n\
-     Exit: Exit the program!"
-
-let analyse_help_screen_text =
-  help_screen_instruction
-  ^ "\n\
+     analyzer!\n\n\
+     Here are the options for [Analyze]: \n\
      Pie Chart: View expenses from one year in a pie chart of categories.\n\
      Bar Graph: View your expenses in a bar graph per category.\n\
-     Budget: See if you have enough for retirement!"
+     Budget: See if you have enough for retirement!\n\n\
+     Add Exp.: Add an expense to your list.\n\
+     Exit: Exit the program!"
 
 let categories =
   [
@@ -74,10 +73,10 @@ let rec draw_string_newline str x y =
   with Not_found -> draw_string str
 
 let resize_window_after_change new_width new_height =
-  if new_width <> !window_width || new_height <> !window_height then (
-    window_width := new_width;
-    window_height := new_height;
-    resize_window !window_width !window_height)
+  if new_width <> !width || new_height <> !height then (
+    width := new_width;
+    height := new_height;
+    resize_window !width !height)
 
 let handle_view_event len =
   if key_pressed () then
@@ -95,23 +94,23 @@ let handle_view_event len =
   else false
 
 let display_view_headers () =
-  moveto (!window_width / 100) (14 * !window_height / 15);
+  moveto (!width / 100) (14 * !height / 15);
   draw_string "DESCRIPTION";
-  moveto (3 * !window_width / 10) (14 * !window_height / 15);
+  moveto (3 * !width / 10) (14 * !height / 15);
   draw_string "CATEGORY";
-  moveto (6 * !window_width / 10) (14 * !window_height / 15);
+  moveto (6 * !width / 10) (14 * !height / 15);
   draw_string "AMOUNT ($)";
-  moveto (8 * !window_width / 10) (14 * !window_height / 15);
+  moveto (8 * !width / 10) (14 * !height / 15);
   draw_string "DATE"
 
 let draw_entry y expense =
-  moveto (!window_width / 100) y;
+  moveto (!width / 100) y;
   draw_string expense.description;
-  moveto (3 * !window_width / 10) y;
+  moveto (3 * !width / 10) y;
   draw_string expense.category;
-  moveto (6 * !window_width / 10) y;
+  moveto (6 * !width / 10) y;
   draw_string (money_string (string_of_float expense.amount));
-  moveto (8 * !window_width / 10) y;
+  moveto (8 * !width / 10) y;
   draw_string expense.date
 
 let rec draw_entries y start acc lst =
@@ -121,16 +120,18 @@ let rec draw_entries y start acc lst =
       if start > 0 then draw_entries y (start - 1) acc rest
       else if acc < 10 then (
         draw_entry y expense;
-        draw_entries (y - (!window_height / 15)) start (acc + 1) rest)
+        draw_entries (y - (!height / 15)) start (acc + 1) rest)
 
 let display_view_instructions () =
-  moveto (!window_width / 100) (!window_height / 100);
-  draw_string "<Press [w] - up or [s] - down to see other rows>"
+  moveto (!width / 100) (!height / 100);
+  draw_string
+    "<Press [w] - up or [s] - down to see other rows, close this window to go \
+     back.>"
 
 let display_view_check_resize list =
   resize_window_after_change (size_x ()) (size_y ());
   display_view_headers ();
-  draw_entries (12 * !window_height / 15) !current 0 list;
+  draw_entries (12 * !height / 15) !current 0 list;
   display_view_instructions ()
 
 let rec view_expenses_loop list =
@@ -146,26 +147,25 @@ let display_view_expenses_screen list =
     view_expenses_loop list
   with Graphic_failure _ -> close_graph ()
 
-let handle_exit_help_screen () =
+let handle_exit_screen () =
   match read_key () with
   | _ -> true
 
 let help_screen_check_resize str =
   resize_window_after_change (size_x ()) (size_y ());
-  moveto (!window_width / 100) (14 * !window_height / 15);
+  moveto (!width / 100) (14 * !height / 15);
   let text =
     match str with
     | "Home" -> home_help_screen_text
     | "Main" -> main_help_screen_text
-    | "Analyze" -> analyse_help_screen_text
     | _ -> "No help available :("
   in
-  draw_string_newline text (!window_width / 100) (14 * !window_height / 15)
+  draw_string_newline text (!width / 100) (14 * !height / 15)
 
 let rec help_screen_loop str =
   try
     help_screen_check_resize str;
-    if handle_exit_help_screen () then true else help_screen_loop str
+    if handle_exit_screen () then true else help_screen_loop str
   with Graphic_failure _ -> false
 
 let rec display_help_screen str =
@@ -186,7 +186,7 @@ let move_to_x_and_y_for_titles x y text =
   let y_position = y - text_height in
   moveto x_position y_position
 
-let display_total_instructions () =
+let display_exit_instructions () =
   let instruction = "<Press any key to exit>" in
   move_to_x_and_y (size_x ()) (size_y () / 5) instruction;
   draw_string instruction
@@ -195,8 +195,8 @@ let display_total_expenses_text total_expenses_text =
   clear_graph ();
   move_to_x_and_y (size_x ()) (size_y ()) total_expenses_text;
   draw_string total_expenses_text;
-  moveto (!window_width / 100) (!window_height / 100);
-  display_total_instructions ()
+  moveto (!width / 100) (!height / 100);
+  display_exit_instructions ()
 
 let display_total_check_resize total_expenses_text =
   resize_window_after_change (size_x ()) (size_y ());
@@ -205,7 +205,7 @@ let display_total_check_resize total_expenses_text =
 let rec total_expenses_loop total_expenses_text =
   try
     display_total_check_resize total_expenses_text;
-    if handle_exit_help_screen () then true
+    if handle_exit_screen () then true
     else total_expenses_loop total_expenses_text
   with Graphic_failure _ -> false
 
@@ -233,13 +233,10 @@ let main_default () =
   resize_window_after_change (size_x ()) (size_y ());
   set_color black;
   let text = "Welcome to Your Expense Tracker" in
-  move_to_x_and_y_for_titles !window_width (4 * !window_height / 5) text;
+  move_to_x_and_y_for_titles !width (4 * !height / 5) text;
   draw_string text;
-  draw_buttons !window_width !window_height categories;
-  draw_help_button
-    (9 * !window_width / 10)
-    (!window_height - (!window_width / 10))
-    (!window_width / 20)
+  draw_buttons !width !height categories;
+  draw_help_button (9 * !width / 10) (!height - (!width / 10)) (!width / 20)
 
 let check_click () = if button_down () then mouse_pos () else (-1, -1)
 
@@ -253,17 +250,17 @@ let save_expenses_refactored () =
 
 let display_pie_chart list =
   open_graph "";
-  auto_synchronize true;
   let textbox_for_year_pie =
     open_textbox_with_prompt ("Year - choose from (" ^ possible_years list ^ ")")
   in
   close_graph ();
   if List.mem (int_of_string textbox_for_year_pie) (possible_years_list list)
-  then
+  then (
     let categories = get_categories list in
     let year_expenses = get_expense_by_year list textbox_for_year_pie in
     let data = get_pie_data (amount_by_category year_expenses categories) in
-    draw_pie_chart_with_labels data (Array.of_list categories)
+    draw_pie_chart_with_labels data (Array.of_list categories);
+    exit := 2)
   else (
     open_graph "";
     auto_synchronize true;
@@ -275,7 +272,8 @@ let display_pie_chart list =
       ((size_y () - get_size_y (text_size msg)) / 2);
     draw_string msg;
     Unix.sleep 3;
-    close_graph ())
+    exit := 2;
+    clear_graph ())
 
 let display_budget list =
   open_graph "";
@@ -314,43 +312,52 @@ let display_budget list =
     (required_savings_per_year age risk_profile list income retirement_goal
        bank_balance);
   synchronize ();
-  ignore (wait_next_event [ Button_down ]);
-  close_graph ()
+  if handle_exit_screen () then (
+    exit := 2;
+    clear_graph ())
 
 let handle_category analyse_category list =
   match analyse_category with
   | "Circular Button" -> if display_help_screen "Analyze" then ()
   | "Pie Chart" -> display_pie_chart list
-  | "Bar graph" -> draw_bar_graph (total_expenses_per_year list)
+  | "Bar Graph" ->
+      open_graph "";
+      display_exit_instructions ();
+      draw_bar_graph (total_expenses_per_year list);
+      exit := 2
   | "Budget" -> display_budget list
   | _ -> ()
 
 let analyze_click list =
   let click_x, click_y = check_click () in
   let button =
-    find_clicked_button click_x click_y !window_width !window_height
-      (initial_button_x !window_width analyze_categories)
-      (!window_height / 3) analyze_categories analyze_categories
+    find_clicked_button click_x click_y !width !height
+      (initial_button_x !width analyze_categories)
+      (!height / 3) analyze_categories analyze_categories
   in
   match button with
   | Some analyse_categories -> handle_category analyse_categories list
   | _ -> ()
 
-let analyse_refactored list =
+let rec analyse_loop list =
+  resize_window_after_change (size_x ()) (size_y ());
+  draw_analyze_buttons !width !height;
+  analyze_click list;
+  if !exit <> 2 then analyse_loop list
+
+let analyse_refactored list : unit =
   close_graph ();
   open_graph "";
-  draw_analyze_buttons !window_width !window_height;
-  analyze_click list
+  analyse_loop list
 
 let main_clicked_button list =
   let click_x, click_y = check_click () in
   if check_click () <> (-1, -1) then
     match
-      find_clicked_button_with_circle click_x click_y !window_width
-        !window_height
-        (9 * !window_width / 10)
-        (!window_height - (!window_width / 10))
-        (!window_width / 20) categories
+      find_clicked_button_with_circle click_x click_y !width !height
+        (9 * !width / 10)
+        (!height - (!width / 10))
+        (!width / 20) categories
     with
     | Some "View Exp." -> display_view_expenses_screen list
     | Some "Total Exp." -> display_total_expenses_screen list
@@ -358,28 +365,28 @@ let main_clicked_button list =
     | Some "Save Exp." -> save_expenses_refactored ()
     | Some "Add Exp." -> expense_list := add_expense list
     | Some "Analyze" -> analyse_refactored list
-    | Some "Exit" -> close_graph ()
+    | Some "Exit" -> exit := 1
+    | Some "Circular Button" ->
+        if display_help_screen "Main" then clear_graph ()
     | _ -> ()
   else ()
 
 let rec main list =
   expense_list := list;
+  exit := 0;
   open_graph "";
   main_default ();
   main_clicked_button list;
-  main !expense_list
+  if !exit = 1 then close_graph () else main !expense_list
 
 let welcome_screen_default categories =
-  window_width := size_x ();
-  window_height := size_y ();
-  draw_buttons !window_width !window_height categories;
+  width := size_x ();
+  height := size_y ();
+  draw_buttons !width !height categories;
   let text = "Expense Analyser" in
-  move_to_x_and_y_for_titles !window_width (4 * !window_height / 5) text;
+  move_to_x_and_y_for_titles !width (4 * !height / 5) text;
   draw_string text;
-  draw_help_button
-    (9 * !window_width / 10)
-    (!window_height - (!window_width / 10))
-    (!window_width / 20)
+  draw_help_button (9 * !width / 10) (!height - (!width / 10)) (!width / 20)
 
 let load_csv_refactored () =
   let filename = open_textbox_with_prompt "Enter CSV filename:" in
@@ -394,11 +401,10 @@ let rec welcome_screen_check_resize () =
   let click_x, click_y = check_click () in
   if check_click () <> (-1, -1) then
     match
-      find_clicked_button_with_circle click_x click_y !window_width
-        !window_height
-        (9 * !window_width / 10)
-        (!window_height - (!window_width / 10))
-        (!window_width / 20) categories
+      find_clicked_button_with_circle click_x click_y !width !height
+        (9 * !width / 10)
+        (!height - (!width / 10))
+        (!width / 20) categories
     with
     | Some "Load CSV" -> load_csv_refactored ()
     | Some "New CSV" -> main (add_expense [])

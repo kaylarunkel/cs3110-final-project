@@ -23,7 +23,6 @@ let draw_bar x y width height color total year =
 
 let draw_bar_graph year_amount_list =
   try
-    open_graph "800x600";
     resize_window 800 600;
     let max_value =
       List.fold_left (fun acc (_, total) -> max acc total) 0.0 year_amount_list
@@ -56,5 +55,5 @@ let draw_bar_graph year_amount_list =
     done;
     draw 100 year_amount_list;
     ignore (read_key ());
-    close_graph ()
+    clear_graph ()
   with Graphic_failure _ -> close_graph ()
