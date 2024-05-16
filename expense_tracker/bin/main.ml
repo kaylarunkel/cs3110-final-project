@@ -297,11 +297,10 @@ let rec main list =
       let click_y = event.mouse_y in
       let button_width = button_size analyze_categories button_spacing in
       let a_clicked_button =
-        find_clicked_button_with_circle click_x click_y button_width
-          button_height
+        find_clicked_button click_x click_y button_width button_height
           (!window_width - (!window_width / 10))
           (!window_height - (!window_width / 10))
-          (!window_width / 20) categories
+          categories categories
       in
       match a_clicked_button with
       | Some analyze_categories -> handle_a_category analyze_categories list

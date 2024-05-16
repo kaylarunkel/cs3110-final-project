@@ -131,11 +131,7 @@ let button_size (categories : string list) (button_spacing : int) : int =
 
 let draw_analyze_buttons window_width window_height =
   let texts = [ "Pie Chart"; "Bar Graph"; "Budget" ] in
-  draw_buttons window_width window_height texts;
-  draw_help_button
-    (size_x () - (window_width / 10))
-    (size_y () - (window_width / 10))
-    (window_width / 20)
+  draw_buttons window_width window_height texts
 
 (*let draw_buttons_in_rows (num_rows : int) (categories : string list)
   (initial_x : int) (initial_y : int) (button_height : int) (button_spacing :
