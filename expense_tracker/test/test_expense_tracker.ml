@@ -53,6 +53,88 @@ let expense5 =
     date = "06/27/2024";
   }
 
+let expense6 =
+  {
+    description = "Netflix Subscription";
+    category = "Entertainment";
+    amount = 12.99;
+    date = "04/15/2024";
+  }
+
+let expense7 =
+  {
+    description = "Gym Membership";
+    category = "Health";
+    amount = 50.0;
+    date = "05/02/2024";
+  }
+
+let expense8 =
+  {
+    description = "Gasoline";
+    category = "Transportation";
+    amount = 35.0;
+    date = "04/10/2024";
+  }
+
+let expense9 =
+  {
+    description = "Birthday Gift";
+    category = "Gifts";
+    amount = 25.0;
+    date = "05/08/2024";
+  }
+
+let expense10 =
+  {
+    description = "Mobile Phone Bill";
+    category = "Utilities";
+    amount = 60.0;
+    date = "05/20/2024";
+  }
+
+let expense_list2 = [ expense6; expense7; expense8; expense9; expense10 ]
+
+let expense11 =
+  {
+    description = "Movie Tickets";
+    category = "Entertainment";
+    amount = 20.0;
+    date = "04/05/2024";
+  }
+
+let expense12 =
+  {
+    description = "Books";
+    category = "Education";
+    amount = 20.0;
+    date = "05/12/2024";
+  }
+
+let expense13 =
+  {
+    description = "Coffee Beans";
+    category = "Food";
+    amount = 20.0;
+    date = "04/20/2024";
+  }
+
+let expense14 =
+  {
+    description = "Medicine";
+    category = "Health";
+    amount = 20.0;
+    date = "05/03/2024";
+  }
+
+let expense15 =
+  {
+    description = "Bus Fare";
+    category = "Transportation";
+    amount = 20.0;
+    date = "04/17/2024";
+  }
+
 let expenses_tests =
   "test suite for expenses"
   >::: [
@@ -693,6 +775,41 @@ let budgeting_tests =
               you review your expense breakdown through the pie charts and cut \
               back on unnecessary expenses."
              (required_savings_per_year 40 Safe expense_list1 16.0 800.0 0.0) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
+             (required_savings_per_year 32 Risky expense_list2 9.0 900.0 0.0) );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
+             (required_savings_per_year 32 Average expense_list2 13.0 100.0 0.0)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
+             (required_savings_per_year 32 Risky expense_list2 18.0 900.0 0.0)
+         );
+         ( "test required_savings_per_year with age, risk_profile, budget, \
+            income, retirement_goal, and bank_balance 1"
+         >:: fun _ ->
+           assert_equal
+             "You are spending too much relative to your income. We suggest \
+              you review your expense breakdown through the pie charts and cut \
+              back on unnecessary expenses."
+             (required_savings_per_year 32 Average expense_list2 10.0 900.0 0.0)
+         );
        ]
 
 (**let pie_tests = "test_suite" >:::
@@ -709,6 +826,15 @@ let pie_tests =
              (get_pie_data
                 (amount_by_category [ expense1; expense0 ]
                    (get_categories [ expense1; expense0 ]))) );
+         ( "floats to percentages" >:: fun _ ->
+           assert_equal
+             [ 20.0; 20.0; 20.0; 20.0; 20.0 ]
+             (get_pie_data
+                (amount_by_category
+                   [ expense11; expense12; expense13; expense14; expense15 ]
+                   (get_categories
+                      [ expense11; expense12; expense13; expense14; expense15 ])))
+         );
        ]
 
 let textbox_tests =
