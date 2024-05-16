@@ -222,42 +222,13 @@ let display_total_expenses_screen list =
     if total_expenses_loop total_expenses_text then close_graph ()
   with Graphic_failure _ -> close_graph ()
 
-let rec get_valid_date () =
-  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
-  match String.split_on_char '/' date with
-  | [ month; day; year ] -> (
-      try
-        let _ = int_of_string month in
-        let _ = int_of_string day in
-        let _ = int_of_string year in
-        if
-          String.length month = 2
-          && String.length day = 2
-          && String.length year = 4
-        then date
-        else get_valid_date ()
-      with Failure _ -> get_valid_date ())
-  | _ -> get_valid_date ()
-
 let add_expense list =
   let description = open_textbox_with_prompt "Enter description:" in
   open_graph "";
   let category = open_textbox_with_prompt "Enter category:" in
-  let rec get_valid_amount () =
-    let amount_str =
-      open_textbox_with_prompt "Enter amount (must be a number):"
-    in
-    try
-      let amount = float_of_string amount_str in
-      if
-        classify_float amount = FP_normal
-        || classify_float amount = FP_subnormal
-      then amount
-      else get_valid_amount ()
-    with Failure _ -> get_valid_amount ()
-  in
-  let amount = get_valid_amount () in
-  let date = get_valid_date () in
+  let amount_str = open_textbox_with_prompt "Enter amount (must be a #):" in
+  let amount = try float_of_string amount_str with _ -> 0.0 in
+  let date = open_textbox_with_prompt "Enter date (MM/DD/YYYY):" in
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
@@ -273,15 +244,11 @@ let main_default () =
 let check_click () = if button_down () then mouse_pos () else (-1, -1)
 
 let read_expenses_refactored () =
-  let filename =
-    open_textbox_with_prompt "Enter CSV filename (include .csv):"
-  in
+  let filename = open_textbox_with_prompt "Enter CSV filename:" in
   expense_list := read_expenses_from_csv filename
 
 let save_expenses_refactored () =
-  let filename =
-    open_textbox_with_prompt "Enter filename to save (include .csv):"
-  in
+  let filename = open_textbox_with_prompt "Enter filename to save:" in
   save_expenses_to_csv filename !expense_list
 
 let pie_chart_first_prompt list =
@@ -347,8 +314,7 @@ let display_budget_result bank risk age goal income list =
   open_graph "";
   moveto 20 (size_y () / 2);
   let x = required_savings_per_year age risk list income goal bank in
-  draw_string_newline x 20 (size_y () / 2);
-  display_exit_instructions ()
+  draw_string_newline x 20 (size_y () / 2)
 
 let display_invalid_input () =
   open_graph "";
@@ -455,9 +421,7 @@ let welcome_screen_default categories =
   draw_help_button (9 * !width / 10) (!height - (!width / 10)) (!width / 20)
 
 let load_csv_refactored () =
-  let filename =
-    open_textbox_with_prompt "Enter CSV filename (include .csv):"
-  in
+  let filename = open_textbox_with_prompt "Enter CSV filename:" in
   let new_list = read_expenses_from_csv filename in
   Printf.printf "Expenses read from CSV\n  file.\n";
   main new_list

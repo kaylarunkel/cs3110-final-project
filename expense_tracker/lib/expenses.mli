@@ -1,5 +1,3 @@
-(** The Expense Management Module *)
-
 type expense = {
   description : string;  (** Description of the expense *)
   category : string;  (** Category of the expense *)

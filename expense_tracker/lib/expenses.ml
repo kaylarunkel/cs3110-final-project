@@ -5,6 +5,11 @@ type expense = {
   date : string;
 }
 
+type risk_profile =
+  | Safe
+  | Average
+  | Risky
+
 type expense_list = expense list
 
 let add_expense (list : expense_list) (description : string) (category : string)
@@ -78,40 +83,39 @@ let amount_by_category (expenses : expense_list) (categories : string list) =
   in
   List.fold_left update_totals category_with_amount expenses
 
+let assert_for_expenses_by_date_range start_date end_date =
+  let assert_date_format date =
+    assert (String.length date = 10 && date.[2] = '/' && date.[5] = '/')
+  in
+  assert_date_format start_date;
+  assert_date_format end_date
+
+let parse_date date_str =
+  try
+    let parts = String.split_on_char '/' (String.trim date_str) in
+    let year = int_of_string (List.nth parts 2) in
+    let month = int_of_string (List.nth parts 0) in
+    let day = int_of_string (List.nth parts 1) in
+    (year, month, day)
+  with Failure _ as e ->
+    Printf.printf "Failed to parse date string: %s\n" date_str;
+    raise e
+
+let is_in_range start_date end_date expense =
+  let start_year, start_month, start_day = parse_date start_date in
+  let end_year, end_month, end_day = parse_date end_date in
+  let expense_year, expense_month, expense_day = parse_date expense.date in
+  let start_date = (start_year * 10000) + (start_month * 100) + start_day in
+  let end_date = (end_year * 10000) + (end_month * 100) + end_day in
+  let expense_date =
+    (expense_year * 10000) + (expense_month * 100) + expense_day
+  in
+  start_date <= expense_date && expense_date <= end_date
+
 let expenses_by_date_range (expenses : expense list) (start_date : string)
     (end_date : string) : expense list =
-  assert (
-    String.length start_date = 10
-    && start_date.[2] = '/'
-    && start_date.[5] = '/');
-  assert (
-    String.length end_date = 10 && end_date.[2] = '/' && end_date.[5] = '/');
-
-  let parse_date date_str =
-    try
-      let parts = String.split_on_char '/' (String.trim date_str) in
-      let year = int_of_string (List.nth parts 2) in
-      let month = int_of_string (List.nth parts 0) in
-      let day = int_of_string (List.nth parts 1) in
-      (year, month, day)
-    with Failure _ as e ->
-      Printf.printf "Failed to parse date string: %s\n" date_str;
-      raise e
-  in
-
-  let is_in_range expense =
-    let start_year, start_month, start_day = parse_date start_date in
-    let end_year, end_month, end_day = parse_date end_date in
-    let expense_year, expense_month, expense_day = parse_date expense.date in
-    let start_date = (start_year * 10000) + (start_month * 100) + start_day in
-    let end_date = (end_year * 10000) + (end_month * 100) + end_day in
-    let expense_date =
-      (expense_year * 10000) + (expense_month * 100) + expense_day
-    in
-    start_date <= expense_date && expense_date <= end_date
-  in
-
-  List.filter is_in_range expenses
+  assert_for_expenses_by_date_range start_date end_date;
+  List.filter (is_in_range start_date end_date) expenses
 
 let expenses_above (expenses : expense list) (floor : float) =
   List.filter (fun x -> x.amount >= floor) expenses
@@ -186,27 +190,18 @@ let money_string amount =
   else if num + 2 = len then amount ^ "0"
   else amount
 
-let percentage_of_total_expenses_by_category (expenses : expense_list) :
-    (string * float) list =
+let exp_category_refactored expenses_recent_year =
+  amount_by_category expenses_recent_year (get_categories expenses_recent_year)
+
+let percentage_of_total_expenses_by_category expenses =
   let recent_year = List.hd (possible_years_list expenses) |> string_of_int in
   let expenses_recent_year = get_expense_by_year expenses recent_year in
   let total_expenses_recent_year = total_expenses expenses_recent_year in
-  let expenses_by_category =
-    amount_by_category expenses_recent_year
-      (get_categories expenses_recent_year)
-  in
-  let percentages =
-    List.map
-      (fun (category, amount) ->
-        (category, amount /. total_expenses_recent_year *. 100.0))
-      expenses_by_category
-  in
-  percentages
-
-type risk_profile =
-  | Safe
-  | Average
-  | Risky
+  let expenses_by_category = exp_category_refactored expenses_recent_year in
+  List.map
+    (fun (category, amount) ->
+      (category, amount /. total_expenses_recent_year *. 100.0))
+    expenses_by_category
 
 let present_value_retirement_func future_value discount_rate years =
   future_value /. ((1.0 +. discount_rate) ** float_of_int years)
@@ -248,8 +243,8 @@ let required_savings_per_year age risk_profile budget income retirement_goal
     let recent_year = List.hd (possible_years_list budget) |> string_of_int in
     let budget = get_expense_by_year budget recent_year in
     if income < total_expenses budget then
-      "You are spending too much relative to your income. We suggest you \
-       review your expense breakdown. \n\
+      "You are spending too much relative to your income. We suggest youreview \
+       your expense breakdown. \n\
       \ Check your piechart for more information."
     else
       let money_per_year =
@@ -263,9 +258,9 @@ let required_savings_per_year age risk_profile budget income retirement_goal
       if Float.round percent_change > 0. then
         "You have to cut your budget by "
         ^ string_of_float (Float.round percent_change)
-        ^ "0%"
+        ^ "%"
       else if Float.round percent_change < 0. then
         "You can raise your expenditure by "
         ^ string_of_float (-1. *. Float.round percent_change)
-        ^ "0%"
+        ^ "%"
       else "You don't have to change a thing! You are on the right track."
