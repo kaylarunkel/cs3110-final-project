@@ -145,6 +145,14 @@ let expense16 =
     date = "04/17/2022";
   }
 
+let negative_expense =
+  {
+    description = "Gym Membership";
+    category = "Fitness";
+    amount = -20.0;
+    date = "04/17/2022";
+  }
+
 let expenses_tests =
   "test suite for expenses"
   >::: [
@@ -154,6 +162,8 @@ let expenses_tests =
            assert_equal "" empty_expense.description );
          ( "check empty expense" >:: fun _ ->
            assert_equal "" empty_expense.category );
+         ( "check negative expense amount" >:: fun _ ->
+           assert_equal (-20.0) negative_expense.amount );
          ("check empty expense" >:: fun _ -> assert_equal "" empty_expense.date);
          ("check expenses" >:: fun _ -> assert_equal "Food" expense3.category);
          ("check expenses" >:: fun _ -> assert_equal 54.50 expense3.amount);
@@ -183,6 +193,8 @@ let expenses_tests =
              (total_expenses [ expense1; expense2 ]) );
          ( "total expense with zero amount" >:: fun _ ->
            assert_equal 0.0 (total_expenses [ empty_expense ]) );
+         ( "total expense with negative amount" >:: fun _ ->
+           assert_equal (-20.0) (total_expenses [ negative_expense ]) );
          ( "read from csv" >:: fun _ ->
            assert_equal [ expense1; expense2 ]
              (read_expenses_from_csv "testexpenses.csv") );
@@ -196,6 +208,8 @@ let expenses_tests =
              (get_expenses [ expense2; expense1 ] "04/13/2024") );
          ( "get no expenses" >:: fun _ ->
            assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/2023") );
+         ( "get empty expenses" >:: fun _ ->
+           assert_equal [] (get_expenses [ empty_expense ] " ") );
          ( "get no expenses_earlier" >:: fun _ ->
            assert_equal [] (get_expenses [ expense1; expense2 ] "01/02/1900") );
          ( "get categories" >:: fun _ ->
@@ -255,6 +269,10 @@ let expenses_tests =
            assert_equal
              (possible_years [ expense0; expense1; expense2 ])
              "2023, 2024" );
+         ( "years as string duplicate" >:: fun _ ->
+           assert_equal
+             (possible_years [ expense0; expense0; expense2 ])
+             "2023, 2024" );
          ("get years from expenses" >:: fun _ -> assert_equal [] []);
          ( "get years from expenses" >:: fun _ ->
            assert_equal (possible_years_list [ expense0 ]) [ 2024 ] );
@@ -279,6 +297,8 @@ let expenses_tests =
          ( "get expenses for specific year" >:: fun _ ->
            assert_equal [ expense0 ] (get_expense_by_year [ expense0 ] "2024")
          );
+         ( "get expenses for specific year" >:: fun _ ->
+           assert_equal [] (get_expense_by_year [ expense0 ] "") );
          ( "get expenses for specific year" >:: fun _ ->
            assert_equal [ expense0; expense1 ]
              (get_expense_by_year [ expense0; expense1 ] "2024") );
@@ -369,6 +389,10 @@ let expenses_tests =
            assert_equal []
              (expenses_by_date_range [ expense0; expense1 ] "01/01/0000"
                 "01/01/0001") );
+         ( "expenses by very-wide date range" >:: fun _ ->
+           assert_equal [ expense0; expense1 ]
+             (expenses_by_date_range [ expense0; expense1 ] "01/01/0000"
+                "01/01/3000") );
          ( "add expense with special characters in description" >:: fun _ ->
            let expense_special =
              {
@@ -440,6 +464,11 @@ let expenses_tests =
          ( "get expenses by category with multiple matching entries" >:: fun _ ->
            assert_equal [ expense1; expense3 ]
              (get_expenses [ expense1; expense2; expense3 ] "Food") );
+         ( "get expenses by category with multiple duplicate entries"
+         >:: fun _ ->
+           assert_equal
+             [ expense1; expense1; expense1 ]
+             (get_expenses [ expense1; expense1; expense1 ] "Food") );
          ( "get categories from multiple-entry list" >:: fun _ ->
            assert_equal
              [ "Entertainment"; "Food"; "Clothing" ]
@@ -460,6 +489,11 @@ let expenses_tests =
              (expenses_below
                 [ expense0; expense1; expense2; expense3 ]
                 max_float) );
+         ( "expenses below min float amount with multiple entries" >:: fun _ ->
+           assert_equal []
+             (expenses_below
+                [ expense0; expense1; expense2; expense3 ]
+                min_float) );
          ( "expenses between amount values with multiple entries" >:: fun _ ->
            assert_equal [ expense2; expense3 ]
              (expenses_between_ammounts
@@ -568,6 +602,22 @@ let expenses_tests =
                   { expense0 with amount = -10. }; expense1; expense2; expense3;
                 ]
                 10.0 55.0) );
+         ( "expenses between amount values with mixed positive and negative \
+            amounts and amount is zero"
+         >:: fun _ ->
+           assert_equal []
+             (expenses_between_ammounts
+                [
+                  { expense0 with amount = -10. }; expense1; expense2; expense3;
+                ]
+                0.0 0.0) );
+         ( "expenses between amount values with mixed positive and negative \
+            amounts and amount is negative"
+         >:: fun _ ->
+           assert_equal [ negative_expense ]
+             (expenses_between_ammounts
+                [ negative_expense; expense2; expense3 ]
+                (-22.0) 0.0) );
          ( "expenses by date range with multiple entries within range"
          >:: fun _ ->
            assert_equal
@@ -578,9 +628,18 @@ let expenses_tests =
          ( "expenses by date range with single entry on start date" >:: fun _ ->
            assert_equal [ expense0 ]
              (expenses_by_date_range [ expense0 ] "04/13/2024" "12/31/2024") );
+         ( "expenses by date range with multiple entry on start date"
+         >:: fun _ ->
+           assert_equal [ expense0; expense0 ]
+             (expenses_by_date_range [ expense0; expense0 ] "04/13/2024"
+                "12/31/2024") );
          ( "expenses by date range with single entry on end date" >:: fun _ ->
            assert_equal [ expense0 ]
              (expenses_by_date_range [ expense0 ] "01/01/2023" "04/13/2024") );
+         ( "expenses by date range with multiple entry on end date" >:: fun _ ->
+           assert_equal [ expense0; expense0 ]
+             (expenses_by_date_range [ expense0; expense0 ] "01/01/2023"
+                "04/13/2024") );
          ( "get expenses by category with no matching entries" >:: fun _ ->
            assert_equal []
              (get_expenses [ expense1; expense2; expense3 ] "Travel") );
@@ -621,7 +680,7 @@ let expenses_tests =
          >:: fun _ ->
            assert_equal [] (expenses_above [ expense0; expense2 ] 2000000.0) );
          ( "expenses multiple above float amount with non empty expense list \
-            non above"
+            one above"
          >:: fun _ ->
            assert_equal [ expense2 ]
              (expenses_above [ expense0; expense2 ] 21.0) );
@@ -640,6 +699,8 @@ let expenses_tests =
                 22000000000.0) );
          ( "get expense by year with no entries" >:: fun _ ->
            assert_equal [] (get_expense_by_year [] "2024") );
+         ( "get expense by year with no year" >:: fun _ ->
+           assert_equal [] (get_expense_by_year [ expense0 ] "") );
          ( "get years from expenses with no entries" >:: fun _ ->
            assert_equal [] (possible_years_list []) );
          ( "percentage of total expenses by category with single category"
@@ -954,7 +1015,7 @@ let pie_tests =
              (get_pie_data
                 (amount_by_category [ expense1 ] (get_categories [ expense1 ])))
          );
-         ( "floats to percentages" >:: fun _ ->
+         ( "floats to percentages duplicates" >:: fun _ ->
            assert_equal [ 100. ]
              (get_pie_data
                 (amount_by_category

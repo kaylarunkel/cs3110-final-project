@@ -201,7 +201,6 @@ let percentage_of_total_expenses_by_category (expenses : expense_list) :
         (category, amount /. total_expenses_recent_year *. 100.0))
       expenses_by_category
   in
-
   percentages
 
 type risk_profile =
@@ -223,29 +222,22 @@ let money_needed age risk_profile retirement_goal bank_balance =
   let present_value_retirement =
     present_value_retirement_func retirement_goal 0.05 years_until_retirement
   in
-  print_endline "Present value retirement";
-  print_float present_value_retirement;
   let future_value_savings =
     bank_balance *. (1. +. (growth_rate ** float_of_int years_until_retirement))
   in
   let present_value_savings =
     future_value_savings /. (1.05 ** float_of_int years_until_retirement)
   in
-  print_endline "Present value savings";
-  print_float present_value_savings;
   let present_money_needed =
     present_value_retirement -. present_value_savings
   in
-  print_endline "Present money needed";
-  print_float present_money_needed;
+
   let money_needed =
     present_money_needed *. (0.05 -. growth_rate)
     /. (1.
        -. (((1. +. growth_rate) /. 1.05) ** float_of_int years_until_retirement)
        )
   in
-  print_endline "Present money needed";
-  print_float present_money_needed;
   money_needed
 
 let required_savings_per_year age risk_profile budget income retirement_goal
@@ -263,15 +255,11 @@ let required_savings_per_year age risk_profile budget income retirement_goal
       let money_per_year =
         money_needed age risk_profile retirement_goal bank_balance
       in
-      print_endline "Money Needed Per Year: ";
-      print_float money_per_year;
       let current_savings_per_year = income -. total_expenses budget in
-      print_endline "Current Savings: ";
-      print_float current_savings_per_year;
+
       let difference = money_per_year -. current_savings_per_year in
       let percent_change = difference /. total_expenses budget *. 100. in
-      print_endline "Percent Change: ";
-      print_float percent_change;
+
       if Float.round percent_change > 0. then
         "You have to cut your budget by "
         ^ string_of_float (Float.round percent_change)
