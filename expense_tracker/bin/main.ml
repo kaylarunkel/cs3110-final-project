@@ -8,6 +8,7 @@ open Graphics
 let current = ref 0
 let window_width = ref 600
 let window_height = ref 450
+let expense_list = ref []
 
 (*let available_categories = [ "Clothing"; "Food"; "Bills"; "Fitness"; "Travel";
   "Entertainment"; "Housing"; "Education"; "Miscellaneous"; ]*)
@@ -41,6 +42,19 @@ let analyse_help_screen_text =
      Pie Chart: View expenses from one year in a pie chart of categories.\n\
      Bar Graph: View your expenses in a bar graph per category.\n\
      Budget: See if you have enough for retirement!"
+
+let categories =
+  [
+    "View Exp.";
+    "Total Exp.";
+    "Read Exp.";
+    "Save Exp.";
+    "Analyze";
+    "Add Exp.";
+    "Exit";
+  ]
+
+let analyze_categories = [ "Pie Chart"; "Bar Graph"; "Budget" ]
 
 let move_to_newline () =
   let text_size = 20 in
@@ -215,184 +229,145 @@ let add_expense list =
   let new_expense = { description; category; amount; date } in
   new_expense :: list
 
-let rec main list =
-  let categories =
-    [
-      "View Exp.";
-      "Total Exp.";
-      "Read Exp.";
-      "Save Exp.";
-      "Analyze";
-      "Add Exp.";
-      "Exit";
-    ]
-  in
-  let analyze_categories = [ "Pie Chart"; "Bar Graph"; "Budget" ] in
-  open_graph "";
-  auto_synchronize true;
-
+let main_default () =
+  resize_window_after_change (size_x ()) (size_y ());
   set_color black;
-  moveto (size_x () - 390) (size_y () - 50);
-  draw_string "Welcome to Your Expense Tracker!";
-  (* Draw the header text *)
-  let button_spacing = 20 in
-  let max_button_height = 50 in
-  let button_height = min max_button_height (size_y ()) in
-
-  let button_width = button_size categories button_spacing in
+  let text = "Welcome to Your Expense Tracker" in
+  move_to_x_and_y_for_titles !window_width (4 * !window_height / 5) text;
+  draw_string text;
   draw_buttons !window_width !window_height categories;
   draw_help_button
-    (size_x () - button_spacing)
-    (size_y () - button_spacing)
-    (button_spacing / 2);
-
-  let rec check_click () =
-    let event = wait_next_event [ Button_down ] in
-    let click_x = event.mouse_x in
-    let click_y = event.mouse_y in
-    let clicked_button =
-      find_clicked_button_with_circle click_x click_y button_width button_height
-        (!window_width - (!window_width / 10))
-        (!window_height - (!window_width / 10))
-        (!window_width / 20) categories
-    in
-
-    match clicked_button with
-    | Some category -> handle_category category list
-    | None -> check_click ()
-  and handle_category category list =
-    match category with
-    | "View Exp." ->
-        display_view_expenses_screen list;
-        main list
-    | "Total Exp." ->
-        display_total_expenses_screen list;
-        main list
-    | "Read Exp." ->
-        let filename = open_textbox_with_prompt "Enter CSV filename:" in
-        let new_list = read_expenses_from_csv filename in
-        Printf.printf "Expenses read from CSV\n  file.\n";
-        main new_list
-    | "Save Exp." ->
-        let filename = open_textbox_with_prompt "Enter filename to save:" in
-        save_expenses_to_csv filename list;
-        Printf.printf "Expenses saved to CSV file.\n";
-        main list
-    | "Analyze" ->
-        close_graph ();
-        open_graph "";
-        auto_synchronize true;
-        draw_analyze_buttons !window_width !window_height;
-        analyze_click list
-    | "Add Exp." ->
-        let updated_list = add_expense list in
-        main updated_list
-    | "Exit" -> close_graph ()
-    | "Circular Button" -> if display_help_screen "Main" then main list
-    | _ -> check_click ()
-  and analyze_click list =
-    let rec handle_analyze_click () =
-      let event = wait_next_event [ Button_down ] in
-      let click_x = event.mouse_x in
-      let click_y = event.mouse_y in
-      let button_width = button_size analyze_categories button_spacing in
-      let a_clicked_button =
-        find_clicked_button click_x click_y button_width button_height
-          (!window_width - (!window_width / 10))
-          (!window_height - (!window_width / 10))
-          categories categories
-      in
-      match a_clicked_button with
-      | Some analyze_categories -> handle_a_category analyze_categories list
-      | None -> check_click ()
-    and handle_a_category a_category list =
-      match a_category with
-      | "Circular Button" -> if display_help_screen "Analyze" then main list
-      | "Pie Chart" ->
-          open_graph "";
-          auto_synchronize true;
-          let textbox_for_year_pie =
-            open_textbox_with_prompt
-              ("Year - choose from (" ^ possible_years list ^ ")")
-          in
-          close_graph ();
-          if
-            List.mem
-              (int_of_string textbox_for_year_pie)
-              (possible_years_list list)
-          then
-            let categories = get_categories list in
-            let year_expenses = get_expense_by_year list textbox_for_year_pie in
-            let data =
-              get_pie_data (amount_by_category year_expenses categories)
-            in
-            draw_pie_chart_with_labels data (Array.of_list categories)
-          else (
-            open_graph "";
-            auto_synchronize true;
-            let msg =
-              "No data exists for the year you inputted (wait 3 seconds)"
-            in
-            let get_size_x (msg, _) = msg in
-            let get_size_y (_, msg) = msg in
-            moveto
-              ((size_x () - get_size_x (text_size msg)) / 2)
-              ((size_y () - get_size_y (text_size msg)) / 2);
-            draw_string msg;
-            Unix.sleep 3;
-            close_graph ());
-          main list
-      | "Bar Graph" ->
-          let yearly_amounts = total_expenses_per_year list in
-          draw_bar_graph yearly_amounts;
-          main list
-      | "Budget" ->
-          open_graph "";
-          let bank_balance_str =
-            open_textbox_with_prompt
-              "Enter the amount of money currently in your savings account: "
-          in
-          let goal =
-            open_textbox_with_prompt
-              "Enter the value in your bank account you wish to retire with: "
-          in
-          let age = open_textbox_with_prompt "Enter you age:  " in
-
-          let risk_preference_str =
-            open_textbox_with_prompt
-              "Select the risk level at which you prefer to manage your money \
-               (Risky/Normal/Safe) "
-          in
-          let income_str =
-            open_textbox_with_prompt "What is your average yearly income? "
-          in
-
-          let bank_balance = float_of_string bank_balance_str in
-          let risk_profile =
-            match String.lowercase_ascii risk_preference_str with
-            | "Risky" -> Risky
-            | "Normal" -> Average
-            | _ -> Safe
-          in
-          let age = int_of_string age in
-          let retirement_goal = float_of_string goal in
-          let income = float_of_string income_str in
-          open_graph "";
-          moveto 0 (size_y () / 2);
-          draw_string
-            (required_savings_per_year age risk_profile list income
-               retirement_goal bank_balance);
-          synchronize ();
-          ignore (wait_next_event [ Button_down ]);
-          close_graph ();
-          main list
-      | _ -> handle_analyze_click ()
-    in
-    handle_analyze_click ()
-  in
-  check_click ()
+    (9 * !window_width / 10)
+    (!window_height - (!window_width / 10))
+    (!window_width / 20)
 
 let check_click () = if button_down () then mouse_pos () else (-1, -1)
+
+let read_expenses_refactored () =
+  let filename = open_textbox_with_prompt "Enter CSV filename:" in
+  expense_list := read_expenses_from_csv filename
+
+let save_expenses_refactored () =
+  let filename = open_textbox_with_prompt "Enter filename to save:" in
+  save_expenses_to_csv filename !expense_list
+
+let display_pie_chart list =
+  open_graph "";
+  auto_synchronize true;
+  let textbox_for_year_pie =
+    open_textbox_with_prompt ("Year - choose from (" ^ possible_years list ^ ")")
+  in
+  close_graph ();
+  if List.mem (int_of_string textbox_for_year_pie) (possible_years_list list)
+  then
+    let categories = get_categories list in
+    let year_expenses = get_expense_by_year list textbox_for_year_pie in
+    let data = get_pie_data (amount_by_category year_expenses categories) in
+    draw_pie_chart_with_labels data (Array.of_list categories)
+  else (
+    open_graph "";
+    auto_synchronize true;
+    let msg = "No data exists for the year you inputted (wait 3 seconds)" in
+    let get_size_x (msg, _) = msg in
+    let get_size_y (_, msg) = msg in
+    moveto
+      ((size_x () - get_size_x (text_size msg)) / 2)
+      ((size_y () - get_size_y (text_size msg)) / 2);
+    draw_string msg;
+    Unix.sleep 3;
+    close_graph ())
+
+let display_budget list =
+  open_graph "";
+  let bank_balance_str =
+    open_textbox_with_prompt
+      "Enter the amount of money currently in your savings account: "
+  in
+  let goal =
+    open_textbox_with_prompt
+      "Enter the value in your bank account you wish to retire with: "
+  in
+  let age = open_textbox_with_prompt "Enter you age:  " in
+
+  let risk_preference_str =
+    open_textbox_with_prompt
+      "Select the risk level at which you prefer to manage your money \
+       (Risky/Normal/Safe) "
+  in
+  let income_str =
+    open_textbox_with_prompt "What is your average yearly income? "
+  in
+
+  let bank_balance = float_of_string bank_balance_str in
+  let risk_profile =
+    match String.lowercase_ascii risk_preference_str with
+    | "Risky" -> Risky
+    | "Normal" -> Average
+    | _ -> Safe
+  in
+  let age = int_of_string age in
+  let retirement_goal = float_of_string goal in
+  let income = float_of_string income_str in
+  open_graph "";
+  moveto 0 (size_y () / 2);
+  draw_string
+    (required_savings_per_year age risk_profile list income retirement_goal
+       bank_balance);
+  synchronize ();
+  ignore (wait_next_event [ Button_down ]);
+  close_graph ()
+
+let handle_category analyse_category list =
+  match analyse_category with
+  | "Circular Button" -> if display_help_screen "Analyze" then ()
+  | "Pie Chart" -> display_pie_chart list
+  | "Bar graph" -> draw_bar_graph (total_expenses_per_year list)
+  | "Budget" -> display_budget list
+  | _ -> ()
+
+let analyze_click list =
+  let click_x, click_y = check_click () in
+  let button =
+    find_clicked_button click_x click_y !window_width !window_height
+      (initial_button_x !window_width analyze_categories)
+      (!window_height / 3) analyze_categories analyze_categories
+  in
+  match button with
+  | Some analyse_categories -> handle_category analyse_categories list
+  | _ -> ()
+
+let analyse_refactored list =
+  close_graph ();
+  open_graph "";
+  draw_analyze_buttons !window_width !window_height;
+  analyze_click list
+
+let main_clicked_button list =
+  let click_x, click_y = check_click () in
+  if check_click () <> (-1, -1) then
+    match
+      find_clicked_button_with_circle click_x click_y !window_width
+        !window_height
+        (9 * !window_width / 10)
+        (!window_height - (!window_width / 10))
+        (!window_width / 20) categories
+    with
+    | Some "View Exp." -> display_view_expenses_screen list
+    | Some "Total Exp." -> display_total_expenses_screen list
+    | Some "Read Exp." -> read_expenses_refactored ()
+    | Some "Save Exp." -> save_expenses_refactored ()
+    | Some "Add Exp." -> expense_list := add_expense list
+    | Some "Analyze" -> analyse_refactored list
+    | Some "Exit" -> close_graph ()
+    | _ -> ()
+  else ()
+
+let rec main list =
+  expense_list := list;
+  open_graph "";
+  main_default ();
+  main_clicked_button list;
+  main !expense_list
 
 let welcome_screen_default categories =
   window_width := size_x ();
@@ -445,37 +420,5 @@ let display_welcome_screen () =
     open_graph "";
     if welcome_screen_loop () then close_graph ()
   with Graphic_failure _ -> close_graph ()
-
-(*let draw_welcome_screen () = open_graph ""; set_color black; moveto 252 400;
- draw_string "Expense Analyzer";
-
-
- let button_texts = [ "Load CSV"; "New CSV" ] in
-
-
- let button_spacing = 20 in let total_spacing = (List.length button_texts - 1)
- * button_spacing in let available_width = size_x () - total_spacing - 20 in
- let button_width = available_width / List.length button_texts in
-
-
- let initial_x = (size_x () - (button_width * List.length button_texts) -
- total_spacing) / 2 in
-
-
- draw_buttons !window_width !window_height button_texts; draw_help_button
- (size_x () - button_spacing) (size_y () - button_spacing) (button_spacing /
- 2); synchronize ();
-
-
- let rec check_click () = let event = wait_next_event [ Button_down ] in let
- click_x = event.mouse_x in let click_y = event.mouse_y in match
- find_clicked_button_with_circle click_x click_y initial_x 180 button_width 30
- button_spacing button_texts (size_x () - button_spacing) (size_y () -
- button_spacing) (button_spacing / 2) with | Some "Load CSV" -> let filename =
- open_textbox_with_prompt "Enter CSV filename:" in let new_list =
- read_expenses_from_csv filename in Printf.printf "Expenses read from CSV\n
- file.\n"; main new_list | Some "New CSV" -> let updated_list = add_expense []
- in main updated_list | Some "Circular Button" -> display_help_screen "Home" |
- _ -> check_click () in check_click ()*)
 
 let () = display_welcome_screen ()
