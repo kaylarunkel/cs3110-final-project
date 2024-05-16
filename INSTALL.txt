@@ -1,6 +1,6 @@
 In order to install and build our system, you should first 
 unzip the project folder somewhere you can navigate to in the terminal. 
-You can then navigate to the project folder, where you will need to first install
+You can then navigate to the project folder [expense_tracker], where you will need to first install
 the OCaml Graphics library. You can do this by typing in the terminal \
 "opam install graphics". Then all you need to do is type "dune exec bin/main.exe" 
 and enjoy!
