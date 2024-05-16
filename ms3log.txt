@@ -1,3 +1,61 @@
+commit 25aabc68055c0683c5b141df60f605fafb0ae7b6
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu May 16 11:45:30 2024 -0400
+
+    Add more test cases
+    Ilia Raiszadeh(ipr6)
+
+commit add566f7a6979dc5cbfc38a745e08717c0447851
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 11:39:44 2024 -0400
+
+    Eliminate unnecessary comments
+
+commit 1252ebf0bceb196991dbd24e1580765d4b474e26
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 11:31:19 2024 -0400
+
+    Refactor expenses
+
+commit 2ff682a02e11caa827d881809db37a6162d32201
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 16 11:26:14 2024 -0400
+
+    Add report
+
+commit e6202607ca94a5b6942d885b0ce7d018ca52c8b4
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu May 16 11:24:15 2024 -0400
+
+    Fix some failing tests
+    Ilia Raiszadeh (ipr6)
+
+commit 50ff8f56b774802b41dd6060511f795556b97945
+Author: Joonseok Jung <jj575@cornell.edu>
+Date:   Thu May 16 11:19:55 2024 -0400
+
+    Refactor codes and prevent crashing
+
+commit 0152a49282caa682b2debc972b283386e9ae9e68
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu May 16 11:15:51 2024 -0400
+
+    Fix bug with dates and amounts
+    Ilia Raiszadeh(ipr6)
+
+commit d1478b5b1bb7ac52a565ee936903735530ffc020
+Author: Ilia Raiszadeh <ipr6@cornell.edu>
+Date:   Thu May 16 11:02:04 2024 -0400
+
+    Added gitlog.txt file and minor text fix
+    Ilia Raiszadeh(ipr6)
+
+commit 5f41e3c78ac825dd3d962d7ac7eb365684d66593
+Author: Kayla Runkel <kmr227@cornell.edu>
+Date:   Thu May 16 10:58:54 2024 -0400
+
+    Add test plan
+
 commit 6c683b1c27b0605cb810a4c9abfae0842bb07554
 Author: Kayla Runkel <kmr227@cornell.edu>
 Date:   Thu May 16 10:52:26 2024 -0400

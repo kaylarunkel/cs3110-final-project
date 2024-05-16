@@ -1,3 +1,9 @@
+(** @author Flynn Kelleher (fpk24),
+    @author Harsh Patel (hhp26),
+    @author Ilia Raiszadeh (ipr6),
+    @author Joonseok Jung (jj575),
+    @author Kayla Runkel (kmr227) *)
+
 open Expense_tracker.Expenses
 open Expense_tracker.Pie
 open Expense_tracker.Bar
