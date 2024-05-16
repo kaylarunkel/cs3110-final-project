@@ -40,7 +40,7 @@ let draw_pie_chart_with_labels (values : float list) (labels : string array) :
         in
         set_color black;
         set_font "-*-times-medium-r-normal--12-*-*-*-*-*-*-*";
-        moveto label_x label_y;
+        moveto (label_x - 20) label_y;
         draw_string labels.(i);
         start_angle := !start_angle +. slice_angle)
       values;
