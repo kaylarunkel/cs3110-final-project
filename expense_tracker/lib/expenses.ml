@@ -263,9 +263,9 @@ let required_savings_per_year age risk_profile budget income retirement_goal
       if Float.round percent_change > 0. then
         "You have to cut your budget by "
         ^ string_of_float (Float.round percent_change)
-        ^ "%"
+        ^ "0%"
       else if Float.round percent_change < 0. then
         "You can raise your expenditure by "
         ^ string_of_float (-1. *. Float.round percent_change)
-        ^ "%"
+        ^ "0%"
       else "You don't have to change a thing! You are on the right track."

@@ -244,11 +244,15 @@ let main_default () =
 let check_click () = if button_down () then mouse_pos () else (-1, -1)
 
 let read_expenses_refactored () =
-  let filename = open_textbox_with_prompt "Enter CSV filename:" in
+  let filename =
+    open_textbox_with_prompt "Enter CSV filename (include .csv):"
+  in
   expense_list := read_expenses_from_csv filename
 
 let save_expenses_refactored () =
-  let filename = open_textbox_with_prompt "Enter filename to save:" in
+  let filename =
+    open_textbox_with_prompt "Enter filename to save (include .csv):"
+  in
   save_expenses_to_csv filename !expense_list
 
 let pie_chart_first_prompt list =
@@ -314,7 +318,8 @@ let display_budget_result bank risk age goal income list =
   open_graph "";
   moveto 20 (size_y () / 2);
   let x = required_savings_per_year age risk list income goal bank in
-  draw_string_newline x 20 (size_y () / 2)
+  draw_string_newline x 20 (size_y () / 2);
+  display_exit_instructions ()
 
 let display_invalid_input () =
   open_graph "";
@@ -421,7 +426,9 @@ let welcome_screen_default categories =
   draw_help_button (9 * !width / 10) (!height - (!width / 10)) (!width / 20)
 
 let load_csv_refactored () =
-  let filename = open_textbox_with_prompt "Enter CSV filename:" in
+  let filename =
+    open_textbox_with_prompt "Enter CSV filename (include .csv):"
+  in
   let new_list = read_expenses_from_csv filename in
   Printf.printf "Expenses read from CSV\n  file.\n";
   main new_list

@@ -967,37 +967,37 @@ let budgeting_tests =
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 2 full input"
          >:: fun _ ->
-           assert_equal "You have to cut your budget by 50317.%"
+           assert_equal "You have to cut your budget by 50317.0%"
              (required_savings_per_year 40 Average budget_list 1000. 1000000. 0.)
          );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 3 full input"
          >:: fun _ ->
-           assert_equal "You can raise your expenditure by 34316.%"
+           assert_equal "You can raise your expenditure by 34316.0%"
              (required_savings_per_year 50 Average budget_list 10000. 100000.
                 1000.) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 3 full input"
          >:: fun _ ->
-           assert_equal "You can raise your expenditure by 38105.%"
+           assert_equal "You can raise your expenditure by 38105.0%"
              (required_savings_per_year 50 Risky budget_list 10000. 100000.
                 1000.) );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 6 full input"
          >:: fun _ ->
-           assert_equal "You can raise your expenditure by 32093.%"
+           assert_equal "You can raise your expenditure by 32093.0%"
              (required_savings_per_year 50 Safe budget_list 10000. 100000. 1000.)
          );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 4 full input"
          >:: fun _ ->
-           assert_equal "You have to cut your budget by 28664.%"
+           assert_equal "You have to cut your budget by 28664.0%"
              (required_savings_per_year 40 Risky budget_list 1000. 1000000. 0.)
          );
          ( "test required_savings_per_year with age, risk_profile, budget, \
             income, retirement_goal, and bank_balance 5 full input"
          >:: fun _ ->
-           assert_equal "You have to cut your budget by 64494.%"
+           assert_equal "You have to cut your budget by 64494.0%"
              (required_savings_per_year 40 Safe budget_list 1000. 1000000. 0.)
          );
        ]
